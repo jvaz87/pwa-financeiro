@@ -1,5 +1,5 @@
+import styles from "../styles/app.module.css";
 import { useEffect, useState } from "react";
-import "../styles/app.css";
 
 export default function Home() {
   const [screen, setScreen] = useState("home");
@@ -448,3 +448,4 @@ function HeadMeta() {
     </>
   );
 }
+
