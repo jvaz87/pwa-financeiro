@@ -130,14 +130,63 @@ export default function Home() {
       )}
 
       {/* DASHBOARD */}
-      {screen === "dash" && (
-        <section className={styles.card}>
-          <p>Gastos: {brl(totals.gasto)}</p>
-          <p>Recebimentos: {brl(totals.recebimento)}</p>
-          <p>Saldo: {brl(totals.saldo)}</p>
-          <button onClick={() => setScreen("home")}>Voltar</button>
-        </section>
-      )}
+    {screen === "dash" && (
+  <section className={styles.dash}>
+    <div className={styles.kpiGrid}>
+      <div className={styles.kpiCard}>
+        <div className={styles.kpiLabel}>Recebimentos</div>
+        <div className={styles.kpiValue}>{brl(totals.recebimento)}</div>
+        <div className={styles.kpiHint}>Total no mês</div>
+      </div>
+
+      <div className={styles.kpiCard}>
+        <div className={styles.kpiLabel}>Gastos</div>
+        <div className={styles.kpiValue}>{brl(totals.gasto)}</div>
+        <div className={styles.kpiHint}>Total no mês</div>
+      </div>
+
+      <div className={styles.kpiCardWide}>
+        <div className={styles.kpiLabel}>Saldo</div>
+        <div className={styles.kpiValueStrong}>{brl(totals.saldo)}</div>
+
+        {(() => {
+          const rec = Number(totals.recebimento || 0);
+          const gas = Number(totals.gasto || 0);
+          const perc = rec > 0 ? Math.min(100, Math.round((gas / rec) * 100)) : 0;
+
+          return (
+            <>
+              <div className={styles.barRow}>
+                <span className={styles.barLabel}>Gasto / Receb.</span>
+                <span className={styles.barValue}>{rec > 0 ? `${perc}%` : "—"}</span>
+              </div>
+
+              <div className={styles.progress}>
+                <div className={styles.progressFill} style={{ width: `${perc}%` }} />
+              </div>
+
+              <div className={styles.splitGrid}>
+                <div className={styles.splitCard}>
+                  <div className={styles.splitTitle}>Fixo</div>
+                  <div className={styles.splitValue}>{brl(totals.fixo)}</div>
+                </div>
+                <div className={styles.splitCard}>
+                  <div className={styles.splitTitle}>Variável</div>
+                  <div className={styles.splitValue}>{brl(totals.variavel)}</div>
+                </div>
+              </div>
+            </>
+          );
+        })()}
+      </div>
+    </div>
+
+    <div className={styles.dashActions}>
+      <button onClick={refresh}>Atualizar</button>
+      <button onClick={() => setScreen("home")}>Voltar</button>
+    </div>
+  </section>
+)}
 
       {/* ADD */}
       {screen === "add" && (
@@ -205,3 +254,4 @@ export default function Home() {
     </div>
   );
 }
+
