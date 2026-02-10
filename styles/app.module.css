@@ -1,55 +1,3 @@
-/* =========================
-   GLOBAIS (CSS Modules SAFE)
-   ========================= */
-:global {
-  :root{
-    --bg:#0b1220;
-    --card:#111a2e;
-    --muted:#9fb0d0;
-    --text:#eef3ff;
-    --accent:#6ea8ff;
-    --danger:#ff6e6e;
-    --ok:#63e6be;
-    --line:rgba(255,255,255,.08);
-    --radius:18px;
-  }
-
-  *{
-    box-sizing:border-box;
-    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
-  }
-
-  html, body{
-    margin:0;
-    background:linear-gradient(180deg,#081022, #0b1220);
-    color:var(--text);
-    min-height:100%;
-  }
-
-  button{
-    background:none;
-    border:none;
-    color:inherit;
-  }
-
-  input, select{
-    background:rgba(255,255,255,.04);
-    border:1px solid var(--line);
-    border-radius:14px;
-    padding:12px;
-    color:var(--text);
-    font-size:15px;
-    outline:none;
-  }
-
-  select{
-    appearance:none;
-  }
-}
-
-/* =========================
-   WRAPPER PRINCIPAL
-   ========================= */
 .app{
   min-height:100vh;
   padding:16px 14px 90px;
@@ -57,9 +5,7 @@
   margin:0 auto;
 }
 
-/* =========================
-   TOPO
-   ========================= */
+/* TOPO */
 .topbar{
   display:flex;
   justify-content:space-between;
@@ -74,9 +20,7 @@
   margin:0;
 }
 
-/* =========================
-   CARDS
-   ========================= */
+/* CARDS */
 .card{
   background:rgba(17,26,46,.92);
   border:1px solid var(--line);
@@ -87,9 +31,7 @@
   gap:12px;
 }
 
-/* =========================
-   BOTÕES GRANDES (HOME)
-   ========================= */
+/* HOME BUTTONS */
 .card button{
   width:100%;
   padding:14px;
@@ -105,39 +47,19 @@
   background:rgba(110,168,255,.18);
 }
 
-/* =========================
-   DASHBOARD
-   ========================= */
+/* DASH */
 .card p{
   margin:0;
   font-weight:900;
   font-size:15px;
 }
 
-.card p:nth-child(1){ color:#ff6e6e; }      /* Gastos */
-.card p:nth-child(2){ color:#63e6be; }      /* Recebimentos */
-.card p:nth-child(3){ color:#6ea8ff; }      /* Saldo */
-
-/* =========================
-   FORMULÁRIOS
-   ========================= */
+/* FORM */
 .card input,
 .card select{
   width:100%;
 }
 
-.card select{
-  font-weight:800;
-}
-
-.card button:last-child{
-  background:linear-gradient(180deg,var(--accent),#3b79ff);
-  color:#071027;
-}
-
-/* =========================
-   HISTÓRICO
-   ========================= */
 .item{
   padding:12px;
   border-radius:14px;
@@ -167,9 +89,6 @@
   cursor:pointer;
 }
 
-/* =========================
-   MENSAGENS
-   ========================= */
 .msg{
   margin-top:14px;
   font-weight:900;
