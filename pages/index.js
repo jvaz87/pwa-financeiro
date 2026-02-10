@@ -182,7 +182,7 @@ export default function Home() {
                     <div className={styles.progress}>
                       <div
                         className={`${styles.progressFill} ${
-                          perc >= 80 ? styles.barRed : perc >= 50 ? styles.barYellow : styles.barBlue
+                          perc >= 80 ? styles.barRed : perc >= 50 ? styles.barYellow : styles.barGreen
                         }`}
                         style={{ width: `${Math.min(100, Math.round(perc))}%` }}
                       />
@@ -294,4 +294,5 @@ export default function Home() {
     </div>
   );
 }
+
 
