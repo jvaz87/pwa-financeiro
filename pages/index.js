@@ -147,7 +147,14 @@ export default function Home() {
 
       <div className={styles.kpiCardWide}>
         <div className={styles.kpiLabel}>Saldo</div>
-        <div className={styles.kpiValueStrong}>{brl(totals.saldo)}</div>
+        <div
+  className={`${styles.kpiValueStrong} ${
+    Number(totals.saldo || 0) >= 0 ? styles.saldoPos : styles.saldoNeg
+  }`}
+>
+  {brl(totals.saldo)}
+</div>
+
 
         {(() => {
           const rec = Number(totals.recebimento || 0);
@@ -255,6 +262,7 @@ export default function Home() {
     </div>
   );
 }
+
 
 
 
