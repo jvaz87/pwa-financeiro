@@ -1,11 +1,12 @@
+/* Wrapper principal */
 .app{
   min-height:100vh;
   padding:16px 14px 90px;
-  max-width:720px;
+  max-width:860px;
   margin:0 auto;
 }
 
-/* TOPO */
+/* Topo */
 .topbar{
   display:flex;
   justify-content:space-between;
@@ -20,7 +21,7 @@
   margin:0;
 }
 
-/* CARDS */
+/* Card base */
 .card{
   background:rgba(17,26,46,.92);
   border:1px solid var(--line);
@@ -31,7 +32,7 @@
   gap:12px;
 }
 
-/* HOME BUTTONS */
+/* Botões da home */
 .card button{
   width:100%;
   padding:14px;
@@ -47,17 +48,37 @@
   background:rgba(110,168,255,.18);
 }
 
-/* DASH */
-.card p{
-  margin:0;
+/* Mensagem */
+.msg{
+  margin-top:14px;
   font-weight:900;
-  font-size:15px;
+  text-align:center;
+  color:var(--muted);
 }
 
-/* FORM */
-.card input,
-.card select{
-  width:100%;
+/* Utilitários */
+.row2{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:10px;
+}
+
+.primaryBtn{
+  background:linear-gradient(180deg,var(--accent),#3b79ff) !important;
+  color:#071027 !important;
+}
+
+.dangerBtn{
+  background:rgba(255,110,110,.2) !important;
+  color:#ff6e6e !important;
+}
+
+/* ===== HISTÓRICO ===== */
+.empty{
+  color:var(--muted);
+  font-weight:900;
+  text-align:center;
+  padding:10px 0;
 }
 
 .item{
@@ -66,37 +87,41 @@
   border:1px solid var(--line);
   background:rgba(255,255,255,.03);
   display:grid;
-  gap:6px;
+  gap:8px;
 }
 
-.item strong{
+.itemTop{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+
+.itemTop strong{
   font-size:15px;
   font-weight:900;
 }
 
-.item span{
+.badge{
+  font-size:12px;
+  font-weight:900;
+  color:var(--muted);
+  border:1px solid var(--line);
+  padding:4px 10px;
+  border-radius:999px;
+  background:rgba(255,255,255,.02);
+}
+
+.itemMeta{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  color:var(--muted);
+  font-weight:900;
   font-size:13px;
-  color:var(--muted);
 }
 
-.item button{
-  margin-top:6px;
-  padding:8px;
-  border-radius:10px;
-  background:rgba(255,110,110,.2);
-  color:#ff6e6e;
-  font-weight:900;
-  cursor:pointer;
-}
-
-.msg{
-  margin-top:14px;
-  font-weight:900;
-  text-align:center;
-  color:var(--muted);
-}
-
-/* ===== DASHBOARD ===== */
+/* ===== DASHBOARD (Nível 1) ===== */
 .dash{
   display:grid;
   gap:14px;
@@ -107,7 +132,7 @@
   gap:12px;
 }
 
-@media (min-width: 520px){
+@media (min-width: 640px){
   .kpiGrid{
     grid-template-columns: 1fr 1fr;
   }
@@ -139,7 +164,7 @@
 }
 
 .kpiValueStrong{
-  font-size:28px;
+  font-size:30px;
   font-weight:1000;
   margin-top:6px;
 }
@@ -149,6 +174,10 @@
   font-size:12px;
   color:var(--muted);
 }
+
+/* Saldo dinâmico */
+.saldoPos { color: #63e6be; }   /* verde */
+.saldoNeg { color: #ff6e6e; }   /* vermelho */
 
 .barRow{
   display:flex;
@@ -172,8 +201,12 @@
 .progressFill{
   height:100%;
   border-radius:999px;
-  background:linear-gradient(90deg, #ff6e6e, #6ea8ff);
 }
+
+/* Barra dinâmica */
+.barBlue   { background: linear-gradient(90deg, #6ea8ff, #3b79ff); }
+.barYellow { background: linear-gradient(90deg, #ffd166, #ffb703); }
+.barRed    { background: linear-gradient(90deg, #ff6e6e, #ff3b3b); }
 
 .splitGrid{
   display:grid;
@@ -217,12 +250,3 @@
   font-size:15px;
   cursor:pointer;
 }
-
-/* ===== CORES DINÂMICAS ===== */
-.saldoPos { color: #63e6be; }   /* verde */
-.saldoNeg { color: #ff6e6e; }   /* vermelho */
-
-/* barra dinâmica */
-.barBlue   { background: linear-gradient(90deg, #6ea8ff, #3b79ff); }
-.barYellow { background: linear-gradient(90deg, #ffd166, #ffb703); }
-.barRed    { background: linear-gradient(90deg, #ff6e6e, #ff3b3b); }
