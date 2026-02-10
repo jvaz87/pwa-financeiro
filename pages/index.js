@@ -130,7 +130,7 @@ export default function Home() {
       )}
 
       {/* DASHBOARD */}
-    {screen === "dash" && (
+   {screen === "dash" && (
   <section className={styles.dash}>
     <div className={styles.kpiGrid}>
       <div className={styles.kpiCard}>
@@ -187,6 +187,7 @@ export default function Home() {
     </div>
   </section>
 )}
+
 
       {/* ADD */}
       {screen === "add" && (
@@ -254,4 +255,5 @@ export default function Home() {
     </div>
   );
 }
+
 
