@@ -112,7 +112,7 @@ export default function Home() {
     <div className={styles.app}>
       {/* TOPO */}
       <header className={styles.topbar}>
-        <h1>Controle Financeiro</h1>
+        <h1>Controle Financeiro • v2</h1>
         <select value={month} onChange={(e) => setMonth(e.target.value)}>
           {months.map((m) => (
             <option key={m}>{m}</option>
@@ -255,5 +255,6 @@ export default function Home() {
     </div>
   );
 }
+
 
 
