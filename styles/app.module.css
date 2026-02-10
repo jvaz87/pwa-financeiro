@@ -95,3 +95,125 @@
   text-align:center;
   color:var(--muted);
 }
+
+/* ===== DASHBOARD ===== */
+.dash{
+  display:grid;
+  gap:14px;
+}
+
+.kpiGrid{
+  display:grid;
+  gap:12px;
+}
+
+@media (min-width: 520px){
+  .kpiGrid{
+    grid-template-columns: 1fr 1fr;
+  }
+  .kpiCardWide{
+    grid-column: 1 / -1;
+  }
+}
+
+.kpiCard,
+.kpiCardWide{
+  background:rgba(17,26,46,.92);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:14px;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
+}
+
+.kpiLabel{
+  font-weight:900;
+  color:var(--muted);
+  font-size:13px;
+  letter-spacing:.2px;
+}
+
+.kpiValue{
+  font-size:22px;
+  font-weight:900;
+  margin-top:6px;
+}
+
+.kpiValueStrong{
+  font-size:28px;
+  font-weight:1000;
+  margin-top:6px;
+}
+
+.kpiHint{
+  margin-top:6px;
+  font-size:12px;
+  color:var(--muted);
+}
+
+.barRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:12px;
+  font-size:12px;
+  color:var(--muted);
+  font-weight:900;
+}
+
+.progress{
+  height:12px;
+  border-radius:999px;
+  background:rgba(255,255,255,.06);
+  border:1px solid var(--line);
+  overflow:hidden;
+  margin-top:8px;
+}
+
+.progressFill{
+  height:100%;
+  border-radius:999px;
+  background:linear-gradient(90deg, #ff6e6e, #6ea8ff);
+}
+
+.splitGrid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:10px;
+  margin-top:12px;
+}
+
+.splitCard{
+  padding:12px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.03);
+}
+
+.splitTitle{
+  font-size:12px;
+  color:var(--muted);
+  font-weight:900;
+}
+
+.splitValue{
+  margin-top:6px;
+  font-size:16px;
+  font-weight:900;
+}
+
+.dashActions{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:10px;
+}
+
+.dashActions button{
+  width:100%;
+  padding:12px;
+  border-radius:16px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.04);
+  font-weight:900;
+  font-size:15px;
+  cursor:pointer;
+}
