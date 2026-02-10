@@ -207,6 +207,7 @@
 .barBlue   { background: linear-gradient(90deg, #6ea8ff, #3b79ff); }
 .barYellow { background: linear-gradient(90deg, #ffd166, #ffb703); }
 .barRed    { background: linear-gradient(90deg, #ff6e6e, #ff3b3b); }
+.barGreen  { background: linear-gradient(90deg, #63e6be, #2dd4bf); }
 
 .splitGrid{
   display:grid;
@@ -250,3 +251,4 @@
   font-size:15px;
   cursor:pointer;
 }
+
