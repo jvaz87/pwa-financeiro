@@ -169,7 +169,12 @@ export default function Home() {
               </div>
 
               <div className={styles.progress}>
-                <div className={styles.progressFill} style={{ width: `${perc}%` }} />
+                <div
+    className={`${styles.progressFill} ${
+      perc >= 80 ? styles.barRed : perc >= 50 ? styles.barYellow : styles.barBlue
+    }`}
+    style={{ width: `${Math.min(100, Math.round(perc))}%` }}
+  />
               </div>
 
               <div className={styles.splitGrid}>
@@ -262,6 +267,7 @@ export default function Home() {
     </div>
   );
 }
+
 
 
 
