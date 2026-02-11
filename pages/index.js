@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from "../styles/app.module.css";
 
 export default function Home() {
@@ -14,6 +14,9 @@ export default function Home() {
     variavel: 0,
   });
   const [msg, setMsg] = useState("");
+
+  // edição (histórico)
+  const [editing, setEditing] = useState(null); // { id, sheet }
 
   const [form, setForm] = useState({
     date: todayISO(),
@@ -43,11 +46,56 @@ export default function Home() {
     return j;
   }
 
+  function todayISO() {
+    const d = new Date();
+    return d.toISOString().slice(0, 10);
+  }
+
+  const getMesAtualYM = () => {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    return `${y}-${m}`; // "YYYY-MM"
+  };
+
+  // "YYYY-MM" -> "Fev/2026"
+  const formatMesAno = (ym) => {
+    if (!ym) return "";
+    const [year, monthStr] = ym.split("-");
+    const meses = [
+      "Jan",
+      "Fev",
+      "Mar",
+      "Abr",
+      "Mai",
+      "Jun",
+      "Jul",
+      "Ago",
+      "Set",
+      "Out",
+      "Nov",
+      "Dez",
+    ];
+    const mesNome = meses[Number(monthStr) - 1] || monthStr;
+    return `${mesNome}/${year}`;
+  };
+
   async function init() {
     try {
       const j = await api("init", {});
-      setMonths(j.months || []);
-      setMonth(j.currentMonth || "");
+      const list = j.months || [];
+      setMonths(list);
+
+      // ✅ mês atual automático, mas só se existir na lista
+      const mesAtualYM = getMesAtualYM();
+      const mesAtualExiste = list.some((m) => String(m).startsWith(mesAtualYM));
+
+      if (mesAtualExiste) {
+        const match = list.find((m) => String(m).startsWith(mesAtualYM));
+        setMonth(match || j.currentMonth || "");
+      } else {
+        setMonth(j.currentMonth || "");
+      }
     } catch (e) {
       setMsg("❌ " + e.message);
     }
@@ -71,16 +119,56 @@ export default function Home() {
     }
   }
 
+  function brl(v) {
+    return Number(v || 0).toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+  }
+
+  // obrigatório: desc, value, type, nature
+  function validateForm() {
+    if (!form.desc || !form.value || !form.type || !form.nature) return false;
+    return true;
+  }
+
+  function limparCampos() {
+    setForm((prev) => ({
+      ...prev,
+      date: todayISO(),
+      value: "",
+      desc: "",
+      type: "",
+      nature: "",
+    }));
+  }
+
   async function save() {
     try {
-      if (!form.desc || !form.value || !form.type || !form.nature || !form.pay) {
-        return setMsg("❌ Preencha todos os campos.");
+      setMsg("");
+
+      if (!validateForm()) {
+        return setMsg("❌ Preencha: descrição, valor, tipo e natureza.");
       }
 
-      await api("add", { month, ...form });
+      const payload = {
+        month,
+        ...form,
+      };
 
-      setForm((prev) => ({ ...prev, value: "", desc: "" }));
-      setMsg("✅ Salvo!");
+      if (editing) {
+        // ✅ edição: remove antigo e adiciona novo (não depende de endpoint update)
+        await api("delete", { id: editing.id, sheet: editing.sheet });
+        await api("add", payload);
+
+        setEditing(null);
+        setMsg("✅ Lançamento atualizado!");
+      } else {
+        await api("add", payload);
+        setMsg("✅ Salvo!");
+      }
+
+      limparCampos();
       await refresh();
       setScreen("hist");
     } catch (e) {
@@ -99,17 +187,51 @@ export default function Home() {
     }
   }
 
-  function brl(v) {
-    return Number(v || 0).toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    });
+  function brToISO(dateBR) {
+    // dd/mm/aaaa -> aaaa-mm-dd
+    if (!dateBR || typeof dateBR !== "string") return todayISO();
+    const parts = dateBR.split("/");
+    if (parts.length !== 3) return todayISO();
+    const [dd, mm, yyyy] = parts;
+    if (!yyyy || !mm || !dd) return todayISO();
+    return `${yyyy}-${String(mm).padStart(2, "0")}-${String(dd).padStart(2, "0")}`;
   }
 
-  function todayISO() {
-    const d = new Date();
-    return d.toISOString().slice(0, 10);
+  function startEdit(it) {
+    setEditing({ id: it.id, sheet: it.sheet });
+
+    setForm({
+      date: it.date ? String(it.date).slice(0, 10) : brToISO(it.dateBR),
+      value: it.value ?? "",
+      desc: it.desc ?? "",
+      type: it.type ?? "",
+      nature: it.nature ?? "",
+      pay: it.pay ?? "",
+    });
+
+    setMsg("✏️ Editando lançamento...");
+    setScreen("add");
   }
+
+  function cancelEdit() {
+    setEditing(null);
+    limparCampos();
+    setMsg("");
+  }
+
+  function valueClassByType(type) {
+    const t = String(type || "").toLowerCase();
+    if (t.includes("receb")) return styles.valorRecebimento;
+    if (t.includes("gasto")) return styles.valorGasto;
+    return "";
+  }
+
+  const monthsOptions = useMemo(() => {
+    return (months || []).map((m) => {
+      const ym = String(m).slice(0, 7);
+      return { value: m, label: formatMesAno(ym) };
+    });
+  }, [months]);
 
   return (
     <div className={styles.app}>
@@ -118,9 +240,9 @@ export default function Home() {
         <h1>Controle Financeiro • JVAZ87</h1>
 
         <select value={month} onChange={(e) => setMonth(e.target.value)}>
-          {months.map((m) => (
-            <option key={m} value={m}>
-              {m}
+          {monthsOptions.map((m) => (
+            <option key={m.value} value={m.value}>
+              {m.label}
             </option>
           ))}
         </select>
@@ -138,16 +260,38 @@ export default function Home() {
       {/* DASHBOARD */}
       {screen === "dash" && (
         <section className={styles.dash}>
+          <div className={styles.dashTopRow}>
+            <div className={styles.dashMonthPill}>
+              {formatMesAno(String(month).slice(0, 7))}
+            </div>
+
+            <select
+              className={styles.monthSelectInline}
+              value={month}
+              onChange={(e) => setMonth(e.target.value)}
+            >
+              {monthsOptions.map((m) => (
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <div className={styles.kpiGrid}>
             <div className={styles.kpiCard}>
               <div className={styles.kpiLabel}>Recebimentos</div>
-              <div className={styles.kpiValue}>{brl(totals.recebimento)}</div>
+              <div className={`${styles.kpiValue} ${styles.valorRecebimento}`}>
+                {brl(totals.recebimento)}
+              </div>
               <div className={styles.kpiHint}>Total no mês</div>
             </div>
 
             <div className={styles.kpiCard}>
               <div className={styles.kpiLabel}>Gastos</div>
-              <div className={styles.kpiValue}>{brl(totals.gasto)}</div>
+              <div className={`${styles.kpiValue} ${styles.valorGasto}`}>
+                {brl(totals.gasto)}
+              </div>
               <div className={styles.kpiHint}>Total no mês</div>
             </div>
 
@@ -165,10 +309,7 @@ export default function Home() {
               {(() => {
                 const rec = Number(totals.recebimento || 0);
                 const gas = Number(totals.gasto || 0);
-
-                // ✅ Correção: se rec = 0 e gas > 0, mostra 100% (vermelho)
-                const perc =
-                  rec > 0 ? Math.min(100, (gas / rec) * 100) : gas > 0 ? 100 : 0;
+                const perc = rec > 0 ? Math.min(100, (gas / rec) * 100) : gas > 0 ? 100 : 0;
 
                 return (
                   <>
@@ -182,7 +323,11 @@ export default function Home() {
                     <div className={styles.progress}>
                       <div
                         className={`${styles.progressFill} ${
-                          perc >= 80 ? styles.barRed : perc >= 50 ? styles.barYellow : styles.barGreen
+                          perc >= 80
+                            ? styles.barRed
+                            : perc >= 50
+                            ? styles.barYellow
+                            : styles.barGreen
                         }`}
                         style={{ width: `${Math.min(100, Math.round(perc))}%` }}
                       />
@@ -215,6 +360,18 @@ export default function Home() {
       {/* ADD */}
       {screen === "add" && (
         <section className={styles.card}>
+          <div className={styles.formHeaderRow}>
+            <div className={styles.formTitle}>
+              {editing ? "✏️ Editar lançamento" : "➕ Novo lançamento"}
+            </div>
+
+            {editing && (
+              <button className={styles.ghostBtn} onClick={cancelEdit}>
+                Cancelar edição
+              </button>
+            )}
+          </div>
+
           <input
             type="date"
             value={form.date}
@@ -222,28 +379,35 @@ export default function Home() {
           />
 
           <input
-            placeholder="Descrição"
+            placeholder="Descrição *"
             value={form.desc}
+            required
             onChange={(e) => setForm({ ...form, desc: e.target.value })}
           />
 
           <input
-            placeholder="Valor (ex: 12,50)"
+            placeholder="Valor (ex: 12,50) *"
             value={form.value}
+            required
             onChange={(e) => setForm({ ...form, value: e.target.value })}
           />
 
-          <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value })}>
-            <option value="">Tipo</option>
+          <select
+            value={form.type}
+            required
+            onChange={(e) => setForm({ ...form, type: e.target.value })}
+          >
+            <option value="">Tipo *</option>
             <option>Gasto</option>
             <option>Recebimento</option>
           </select>
 
           <select
             value={form.nature}
+            required
             onChange={(e) => setForm({ ...form, nature: e.target.value })}
           >
-            <option value="">Natureza</option>
+            <option value="">Natureza *</option>
             <option>Fixo</option>
             <option>Variável</option>
           </select>
@@ -256,7 +420,7 @@ export default function Home() {
 
           <div className={styles.row2}>
             <button onClick={save} className={styles.primaryBtn}>
-              Salvar
+              {editing ? "Salvar alterações" : "Salvar"}
             </button>
             <button onClick={() => setScreen("home")}>Cancelar</button>
           </div>
@@ -266,6 +430,17 @@ export default function Home() {
       {/* HIST */}
       {screen === "hist" && (
         <section className={styles.card}>
+          <div className={styles.filtroMes}>
+            <label>Mês</label>
+            <select value={month} onChange={(e) => setMonth(e.target.value)}>
+              {monthsOptions.map((m) => (
+                <option key={m.value} value={m.value}>
+                  {m.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {items.length === 0 ? (
             <div className={styles.empty}>Sem lançamentos neste mês.</div>
           ) : (
@@ -275,13 +450,20 @@ export default function Home() {
                   <strong>{it.desc}</strong>
                   <span className={styles.badge}>{it.type}</span>
                 </div>
+
                 <div className={styles.itemMeta}>
                   <span>{it.dateBR}</span>
-                  <span>{brl(it.value)}</span>
+                  <span className={valueClassByType(it.type)}>{brl(it.value)}</span>
                 </div>
-                <button onClick={() => del(it)} className={styles.dangerBtn}>
-                  Excluir
-                </button>
+
+                <div className={styles.itemActions}>
+                  <button onClick={() => startEdit(it)} className={styles.editBtn}>
+                    Editar
+                  </button>
+                  <button onClick={() => del(it)} className={styles.dangerBtn}>
+                    Excluir
+                  </button>
+                </div>
               </div>
             ))
           )}
@@ -294,5 +476,3 @@ export default function Home() {
     </div>
   );
 }
-
-
