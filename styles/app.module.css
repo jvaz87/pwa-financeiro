@@ -73,6 +73,17 @@
   color:#ff6e6e !important;
 }
 
+/* ===== NOVO: CORES DE VALORES (Recebimento/Gasto) ===== */
+.valorRecebimento{
+  color:#16a34a;
+  font-weight:900;
+}
+
+.valorGasto{
+  color:#dc2626;
+  font-weight:900;
+}
+
 /* ===== HISTÓRICO ===== */
 .empty{
   color:var(--muted);
@@ -119,6 +130,77 @@
   color:var(--muted);
   font-weight:900;
   font-size:13px;
+}
+
+/* ===== NOVO: filtro mês no histórico ===== */
+.filtroMes{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin:0 0 12px;
+}
+
+.filtroMes label{
+  font-size:12px;
+  opacity:.85;
+}
+
+.filtroMes select{
+  width:100%;
+  padding:10px 12px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.06);
+  color:inherit;
+}
+
+/* ===== NOVO: ações do item (Editar/Excluir) ===== */
+.itemActions{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+
+.editBtn{
+  flex:1;
+  background:rgba(37,99,235,.95);
+  color:#fff;
+  border:none;
+  padding:10px 12px;
+  border-radius:10px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.editBtn:hover{
+  filter:brightness(1.05);
+}
+
+/* ===== NOVO: cabeçalho do formulário (modo edição) ===== */
+.formHeaderRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.formTitle{
+  font-weight:900;
+}
+
+.ghostBtn{
+  background:transparent;
+  border:1px solid rgba(255,255,255,.14);
+  border-radius:10px;
+  padding:8px 10px;
+  color:inherit;
+  opacity:.9;
+  cursor:pointer;
+}
+
+.ghostBtn:hover{
+  background:rgba(255,255,255,.05);
 }
 
 /* ===== DASHBOARD (Nível 1) ===== */
@@ -252,3 +334,28 @@
   cursor:pointer;
 }
 
+/* ===== NOVO: linha superior do dashboard com mês ===== */
+.dashTopRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.dashMonthPill{
+  font-size:12px;
+  opacity:.85;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.06);
+  white-space:nowrap;
+}
+
+.monthSelectInline{
+  padding:8px 10px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.06);
+  color:inherit;
+}
