@@ -51,33 +51,58 @@ export default function Home() {
     return d.toISOString().slice(0, 10);
   }
 
-  const getMesAtualYM = () => {
-    const d = new Date();
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    return `${y}-${m}`; // "YYYY-MM"
+  // Mês atual por nome (bate com MONTH_SHEETS)
+  const getMesAtualNome = () => {
+    const map = [
+      "Janeiro",
+      "Fevereiro",
+      "Março",
+      "Abril",
+      "Maio",
+      "Junho",
+      "Julho",
+      "Agosto",
+      "Setembro",
+      "Outubro",
+      "Novembro",
+      "Dezembro",
+    ];
+    return map[new Date().getMonth()];
   };
 
-  // "YYYY-MM" -> "Fev/2026"
-  const formatMesAno = (ym) => {
-    if (!ym) return "";
-    const [year, monthStr] = ym.split("-");
-    const meses = [
-      "Jan",
-      "Fev",
-      "Mar",
-      "Abr",
-      "Mai",
-      "Jun",
-      "Jul",
-      "Ago",
-      "Set",
-      "Out",
-      "Nov",
-      "Dez",
-    ];
-    const mesNome = meses[Number(monthStr) - 1] || monthStr;
-    return `${mesNome}/${year}`;
+  // "Janeiro" -> "Jan/2026"
+  const formatMonthLabel = (monthName) => {
+    const y = new Date().getFullYear();
+    const m = String(monthName || "").toLowerCase();
+
+    const short =
+      m === "janeiro"
+        ? "Jan"
+        : m === "fevereiro"
+        ? "Fev"
+        : m === "março" || m === "marco"
+        ? "Mar"
+        : m === "abril"
+        ? "Abr"
+        : m === "maio"
+        ? "Mai"
+        : m === "junho"
+        ? "Jun"
+        : m === "julho"
+        ? "Jul"
+        : m === "agosto"
+        ? "Ago"
+        : m === "setembro"
+        ? "Set"
+        : m === "outubro"
+        ? "Out"
+        : m === "novembro"
+        ? "Nov"
+        : m === "dezembro"
+        ? "Dez"
+        : monthName;
+
+    return `${short}/${y}`;
   };
 
   async function init() {
@@ -86,16 +111,10 @@ export default function Home() {
       const list = j.months || [];
       setMonths(list);
 
-      // ✅ mês atual automático, mas só se existir na lista
-      const mesAtualYM = getMesAtualYM();
-      const mesAtualExiste = list.some((m) => String(m).startsWith(mesAtualYM));
-
-      if (mesAtualExiste) {
-        const match = list.find((m) => String(m).startsWith(mesAtualYM));
-        setMonth(match || j.currentMonth || "");
-      } else {
-        setMonth(j.currentMonth || "");
-      }
+      // ✅ mês atual selecionado automaticamente
+      const mesAtual = getMesAtualNome();
+      const existe = list.includes(mesAtual);
+      setMonth(existe ? mesAtual : j.currentMonth || "");
     } catch (e) {
       setMsg("❌ " + e.message);
     }
@@ -151,20 +170,23 @@ export default function Home() {
         return setMsg("❌ Preencha: descrição, valor, tipo e natureza.");
       }
 
-      const payload = {
-        month,
-        ...form,
-      };
-
       if (editing) {
-        // ✅ edição: remove antigo e adiciona novo (não depende de endpoint update)
-        await api("delete", { id: editing.id, sheet: editing.sheet });
-        await api("add", payload);
+        // ✅ UPDATE REAL (Apps Script updateEntry_ espera sheet/id e os campos no payload)
+        await api("update", {
+          sheet: editing.sheet,
+          id: editing.id,
+          date: form.date,
+          desc: form.desc,
+          type: form.type,
+          nature: form.nature,
+          pay: form.pay,
+          value: form.value,
+        });
 
         setEditing(null);
         setMsg("✅ Lançamento atualizado!");
       } else {
-        await api("add", payload);
+        await api("add", { month, ...form });
         setMsg("✅ Salvo!");
       }
 
@@ -227,10 +249,10 @@ export default function Home() {
   }
 
   const monthsOptions = useMemo(() => {
-    return (months || []).map((m) => {
-      const ym = String(m).slice(0, 7);
-      return { value: m, label: formatMesAno(ym) };
-    });
+    return (months || []).map((m) => ({
+      value: m,
+      label: formatMonthLabel(m),
+    }));
   }, [months]);
 
   return (
@@ -239,6 +261,7 @@ export default function Home() {
       <header className={styles.topbar}>
         <h1>Controle Financeiro • JVAZ87</h1>
 
+        {/* ✅ mês selecionado controla histórico e dashboard */}
         <select value={month} onChange={(e) => setMonth(e.target.value)}>
           {monthsOptions.map((m) => (
             <option key={m.value} value={m.value}>
@@ -261,9 +284,7 @@ export default function Home() {
       {screen === "dash" && (
         <section className={styles.dash}>
           <div className={styles.dashTopRow}>
-            <div className={styles.dashMonthPill}>
-              {formatMesAno(String(month).slice(0, 7))}
-            </div>
+            <div className={styles.dashMonthPill}>{formatMonthLabel(month)}</div>
 
             <select
               className={styles.monthSelectInline}
@@ -430,6 +451,7 @@ export default function Home() {
       {/* HIST */}
       {screen === "hist" && (
         <section className={styles.card}>
+          {/* filtro por mês (sincroniza dashboard pois muda "month") */}
           <div className={styles.filtroMes}>
             <label>Mês</label>
             <select value={month} onChange={(e) => setMonth(e.target.value)}>
