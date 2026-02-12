@@ -215,23 +215,23 @@ export default function Home() {
 
       {/* DASHBOARD */}
       {screen === "dash" && (
-        <section className={styles.dash}>
+        <section key={month} className={`${styles.dash} ${styles.fadeUp}`}>
           <div className={styles.kpiGrid}>
-            <div className={styles.kpiCard}>
+            <div className={`${styles.kpiCard} ${styles.glass}`}>
               <div className={styles.kpiLabel}>Recebimentos</div>
               <div className={`${styles.kpiValue} ${styles.valorRecebimento}`}>
                 {brl(totals.recebimento)}
               </div>
             </div>
 
-            <div className={styles.kpiCard}>
+            <div className={`${styles.kpiCard} ${styles.glass}`}>
               <div className={`${styles.kpiLabel}`}>Gastos</div>
               <div className={`${styles.kpiValue} ${styles.valorGasto}`}>
                 {brl(totals.gasto)}
               </div>
             </div>
 
-            <div className={styles.kpiCardWide}>
+            <div className={`${styles.kpiCardWide} ${styles.glass}`}
               <div className={styles.kpiLabel}>Saldo</div>
               <div
                 className={`${styles.kpiValueStrong} ${
@@ -245,20 +245,20 @@ export default function Home() {
             </div>
 
             {/* ANUAL SIMPLIFICADO */}
-            <div className={styles.kpiCardWide}>
+            <div className={`${styles.kpiCardWide} ${styles.glass}`}
               <div className={styles.kpiLabel}>
                 Resumo do ano • {selectedYear}
               </div>
 
               <div className={styles.yearInlineGrid}>
-                <div className={styles.yearInlineCard}>
+                <div className={`${styles.yearInlineCard} ${styles.glass}`}
                   <div className={styles.yearInlineTitle}>Recebimentos</div>
                   <div className={`${styles.yearInlineValue} ${styles.valorRecebimento}`}>
                     {brl(yearTotals.recebimento)}
                   </div>
                 </div>
 
-                <div className={styles.yearInlineCard}>
+                <div className={`${styles.yearInlineCard} ${styles.glass}`}
                   <div className={styles.yearInlineTitle}>Gastos</div>
                   <div className={`${styles.yearInlineValue} ${styles.valorGasto}`}>
                     {brl(yearTotals.gasto)}
@@ -333,3 +333,4 @@ export default function Home() {
     </div>
   );
 }
+
