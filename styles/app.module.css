@@ -1,4 +1,3 @@
-/* Wrapper principal */
 .app{
   min-height:100vh;
   padding:16px 14px 90px;
@@ -6,7 +5,6 @@
   margin:0 auto;
 }
 
-/* Topo */
 .topbar{
   display:flex;
   justify-content:space-between;
@@ -21,7 +19,6 @@
   margin:0;
 }
 
-/* ✅ Mobile: topo quebra bonito */
 @media (max-width: 520px){
   .topbar{
     flex-direction:column;
@@ -32,22 +29,19 @@
   }
 }
 
-/* Card base */
 .card{
   background:rgba(17,26,46,.92);
   border:1px solid var(--line);
   border-radius:var(--radius);
   padding:14px;
-  box-shadow:0 10px 30px rgba(0,0,0,.25);
   display:grid;
   gap:12px;
 }
 
-/* Inputs e selects (UX melhor no mobile) */
 .card input,
 .card select{
   width:100%;
-  padding:12px 12px;
+  padding:12px;
   border-radius:14px;
   border:1px solid rgba(255,255,255,.12);
   background:rgba(255,255,255,.06);
@@ -55,46 +49,13 @@
   font-weight:800;
 }
 
-/* Botões da home */
 .card button{
-  width:100%;
   padding:14px;
   border-radius:16px;
   border:1px solid var(--line);
   background:rgba(255,255,255,.04);
   font-weight:900;
-  font-size:16px;
   cursor:pointer;
-}
-
-.card button:hover{
-  background:rgba(110,168,255,.18);
-}
-
-.card button:disabled{
-  opacity:.6;
-  cursor:not-allowed;
-}
-
-/* Mensagem */
-.msg{
-  margin-top:14px;
-  font-weight:900;
-  text-align:center;
-  color:var(--muted);
-}
-
-/* Utilitários */
-.row2{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:10px;
-}
-
-@media (max-width: 520px){
-  .row2{
-    grid-template-columns:1fr;
-  }
 }
 
 .primaryBtn{
@@ -102,25 +63,20 @@
   color:#071027 !important;
 }
 
-.dangerBtn{
-  background:rgba(255,110,110,.2) !important;
-  color:#ff6e6e !important;
-}
-
-/* Cores para valores */
 .valorRecebimento{
   color:#16a34a;
   font-weight:900;
 }
+
 .valorGasto{
   color:#dc2626;
   font-weight:900;
 }
 
-/* HISTÓRICO */
+.saldoPos { color:#16a34a; }
+.saldoNeg { color:#dc2626; }
+
 .empty{
-  color:var(--muted);
-  font-weight:900;
   text-align:center;
   padding:10px 0;
 }
@@ -137,90 +93,41 @@
 .itemTop{
   display:flex;
   justify-content:space-between;
-  align-items:center;
-  gap:10px;
-}
-
-.itemTop strong{
-  font-size:15px;
-  font-weight:900;
 }
 
 .badge{
   font-size:12px;
-  font-weight:900;
-  color:var(--muted);
-  border:1px solid var(--line);
   padding:4px 10px;
   border-radius:999px;
-  background:rgba(255,255,255,.02);
+  background:rgba(255,255,255,.1);
 }
 
 .itemMeta{
   display:flex;
   justify-content:space-between;
-  gap:10px;
-  color:var(--muted);
-  font-weight:900;
-  font-size:13px;
 }
 
-/* ações do item */
 .itemActions{
   display:flex;
   gap:8px;
-  margin-top:10px;
-}
-@media (max-width: 520px){
-  .itemActions{ flex-direction:column; }
 }
 
 .editBtn{
-  flex:1;
-  background:rgba(37,99,235,.95);
+  background:#2563eb;
   color:#fff;
   border:none;
-  padding:10px 12px;
+  padding:10px;
   border-radius:10px;
-  font-weight:900;
-  cursor:pointer;
 }
 
-.editBtn:hover{
-  filter:brightness(1.05);
-}
-
-/* cabeçalho do formulário (modo edição) */
-.formHeaderRow{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:10px;
-}
-@media (max-width: 520px){
-  .formHeaderRow{ flex-direction:column; align-items:flex-start; }
-}
-
-.formTitle{
-  font-weight:900;
-}
-
-.ghostBtn{
-  background:transparent;
-  border:1px solid rgba(255,255,255,.14);
+.dangerBtn{
+  background:#dc2626;
+  color:#fff;
+  border:none;
+  padding:10px;
   border-radius:10px;
-  padding:8px 10px;
-  color:inherit;
-  opacity:.9;
-  cursor:pointer;
 }
 
-.ghostBtn:hover{
-  background:rgba(255,255,255,.05);
-}
-
-/* DASHBOARD */
 .dash{
   display:grid;
   gap:14px;
@@ -231,9 +138,13 @@
   gap:12px;
 }
 
-@media (min-width: 640px){
-  .kpiGrid{ grid-template-columns: 1fr 1fr; }
-  .kpiCardWide{ grid-column: 1 / -1; }
+@media (min-width:640px){
+  .kpiGrid{
+    grid-template-columns:1fr 1fr;
+  }
+  .kpiCardWide{
+    grid-column:1/-1;
+  }
 }
 
 .kpiCard,
@@ -242,14 +153,11 @@
   border:1px solid var(--line);
   border-radius:var(--radius);
   padding:14px;
-  box-shadow:0 10px 30px rgba(0,0,0,.25);
 }
 
 .kpiLabel{
   font-weight:900;
-  color:var(--muted);
   font-size:13px;
-  letter-spacing:.2px;
 }
 
 .kpiValue{
@@ -264,200 +172,17 @@
   margin-top:6px;
 }
 
-.kpiHint{
-  margin-top:6px;
-  font-size:12px;
-  color:var(--muted);
-}
-
-/* Saldo dinâmico */
-.saldoPos { color: #63e6be; }
-.saldoNeg { color: #ff6e6e; }
-
-.barRow{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-top:12px;
-  font-size:12px;
-  color:var(--muted);
-  font-weight:900;
-}
-
-.progress{
-  height:12px;
-  border-radius:999px;
-  background:rgba(255,255,255,.06);
-  border:1px solid var(--line);
-  overflow:hidden;
-  margin-top:8px;
-}
-
-.progressFill{
-  height:100%;
-  border-radius:999px;
-}
-
-/* Barra dinâmica */
-.barYellow { background: linear-gradient(90deg, #ffd166, #ffb703); }
-.barRed    { background: linear-gradient(90deg, #ff6e6e, #ff3b3b); }
-.barGreen  { background: linear-gradient(90deg, #63e6be, #2dd4bf); }
-
-.splitGrid{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:10px;
-  margin-top:12px;
-}
-@media (max-width: 520px){
-  .splitGrid{ grid-template-columns:1fr; }
-}
-
-.splitCard{
-  padding:12px;
-  border-radius:14px;
-  border:1px solid var(--line);
-  background:rgba(255,255,255,.03);
-}
-
-.splitTitle{
-  font-size:12px;
-  color:var(--muted);
-  font-weight:900;
-}
-
-.splitValue{
-  margin-top:6px;
-  font-size:16px;
-  font-weight:900;
-}
-
-.dashActions{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:10px;
-}
-@media (max-width: 520px){
-  .dashActions{ grid-template-columns:1fr; }
-}
-
-.dashActions button{
-  width:100%;
-  padding:12px;
-  border-radius:16px;
-  border:1px solid var(--line);
-  background:rgba(255,255,255,.04);
-  font-weight:900;
-  font-size:15px;
-  cursor:pointer;
-}
-
-/* ✅ Busca por descrição */
-.searchRow{
-  display:flex;
-  gap:10px;
-}
-@media (max-width: 520px){
-  .searchRow{ flex-direction:column; }
-}
-
-.searchInput{
-  flex:1;
-}
-
-.clearBtn{
-  width:auto !important;
-  padding:12px 14px !important;
-  border-radius:14px !important;
-}
-
-/* ✅ Dashboard anual */
-.yearGrid{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:10px;
-  margin-top:10px;
-}
-@media (max-width: 520px){
-  .yearGrid{ grid-template-columns:1fr; }
-}
-
-.yearCard,
-.yearCardWide{
-  padding:12px;
-  border-radius:14px;
-  border:1px solid var(--line);
-  background:rgba(255,255,255,.03);
-}
-
-.yearCardWide{
-  grid-column:1 / -1;
-}
-
-.yearTitle{
-  font-size:12px;
-  color:var(--muted);
-  font-weight:900;
-}
-
-.yearValue{
-  margin-top:6px;
-  font-size:16px;
-  font-weight:900;
-}
-
-.yearValueBig{
-  margin-top:6px;
-  font-size:22px;
-  font-weight:1000;
-}
-
-.yearList{
-  display:grid;
-  gap:8px;
-  margin-top:12px;
-}
-
-.yearRow{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  padding:10px 12px;
-  border-radius:14px;
-  border:1px solid var(--line);
-  background:rgba(255,255,255,.02);
-}
-
-.yearRowLabel{
-  font-weight:900;
-  color:var(--muted);
-  font-size:12px;
-}
-
-.yearRowRight{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  font-weight:900;
-}
-
-.yearSep{
-  opacity:.5;
-}
-
-/* ===== DASHBOARD ANUAL INLINE ===== */
-
+/* ANUAL INLINE */
 .yearInlineGrid{
   display:grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns:repeat(3,1fr);
   gap:10px;
   margin-top:12px;
 }
 
-@media (max-width: 640px){
+@media (max-width:640px){
   .yearInlineGrid{
-    grid-template-columns: 1fr;
+    grid-template-columns:1fr;
   }
 }
 
@@ -472,11 +197,9 @@
 .yearInlineTitle{
   font-size:12px;
   font-weight:900;
-  color:var(--muted);
 }
 
 .yearInlineValue{
-  margin-top:6px;
   font-size:18px;
   font-weight:1000;
 }
