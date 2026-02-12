@@ -277,4 +277,266 @@ export default function Home() {
           <div className={styles.kpiGrid}>
             <div className={styles.kpiCard}>
               <div className={styles.kpiLabel}>Recebimentos</div>
-              <div className={`${styles.kpiValue} $
+              <div className={`${styles.kpiValue} ${styles.valorRecebimento}`}>
+                {brl(totals.recebimento)}
+              </div>
+              <div className={styles.kpiHint}>Total no mês</div>
+            </div>
+
+            <div className={styles.kpiCard}>
+              <div className={styles.kpiLabel}>Gastos</div>
+              <div className={`${styles.kpiValue} ${styles.valorGasto}`}>
+                {brl(totals.gasto)}
+              </div>
+              <div className={styles.kpiHint}>Total no mês</div>
+            </div>
+
+            <div className={styles.kpiCardWide}>
+              <div className={styles.kpiLabel}>Saldo</div>
+
+              <div
+                className={`${styles.kpiValueStrong} ${
+                  Number(totals.saldo || 0) >= 0 ? styles.saldoPos : styles.saldoNeg
+                }`}
+              >
+                {brl(totals.saldo)}
+              </div>
+
+              {(() => {
+                const rec = Number(totals.recebimento || 0);
+                const gas = Number(totals.gasto || 0);
+
+                const perc = rec > 0 ? Math.min(100, (gas / rec) * 100) : gas > 0 ? 100 : 0;
+
+                return (
+                  <>
+                    <div className={styles.barRow}>
+                      <span className={styles.barLabel}>Gasto / Receb.</span>
+                      <span className={styles.barValue}>
+                        {rec > 0 ? `${Math.round(perc)}%` : gas > 0 ? "100%" : "—"}
+                      </span>
+                    </div>
+
+                    <div className={styles.progress}>
+                      <div
+                        className={`${styles.progressFill} ${
+                          perc >= 80
+                            ? styles.barRed
+                            : perc >= 50
+                            ? styles.barYellow
+                            : styles.barGreen
+                        }`}
+                        style={{ width: `${Math.min(100, Math.round(perc))}%` }}
+                      />
+                    </div>
+
+                    <div className={styles.splitGrid}>
+                      <div className={styles.splitCard}>
+                        <div className={styles.splitTitle}>Fixo</div>
+                        <div className={styles.splitValue}>{brl(totals.fixo)}</div>
+                      </div>
+
+                      <div className={styles.splitCard}>
+                        <div className={styles.splitTitle}>Variável</div>
+                        <div className={styles.splitValue}>{brl(totals.variavel)}</div>
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+
+            {/* ✅ DASHBOARD ANUAL */}
+            <div className={styles.kpiCardWide}>
+              <div className={styles.kpiLabel}>Resumo do ano • {selectedYear}</div>
+
+              <div className={styles.yearGrid}>
+                <div className={styles.yearCard}>
+                  <div className={styles.yearTitle}>Recebimentos</div>
+                  <div className={`${styles.yearValue} ${styles.valorRecebimento}`}>
+                    {brl(yearTotals.recebimento)}
+                  </div>
+                </div>
+
+                <div className={styles.yearCard}>
+                  <div className={styles.yearTitle}>Gastos</div>
+                  <div className={`${styles.yearValue} ${styles.valorGasto}`}>
+                    {brl(yearTotals.gasto)}
+                  </div>
+                </div>
+
+                <div className={styles.yearCardWide}>
+                  <div className={styles.yearTitle}>Saldo</div>
+                  <div
+                    className={`${styles.yearValueBig} ${
+                      Number(yearTotals.saldo || 0) >= 0 ? styles.saldoPos : styles.saldoNeg
+                    }`}
+                  >
+                    {brl(yearTotals.saldo)}
+                  </div>
+                </div>
+              </div>
+
+              {/* mini lista por mês */}
+              <div className={styles.yearList}>
+                {(yearSeries || []).map((m) => (
+                  <div key={m.month} className={styles.yearRow}>
+                    <span className={styles.yearRowLabel}>{formatMesAno(m.month)}</span>
+                    <span className={styles.yearRowRight}>
+                      <span className={styles.valorRecebimento}>{brl(m.recebimento)}</span>
+                      <span className={styles.yearSep}>•</span>
+                      <span className={styles.valorGasto}>{brl(m.gasto)}</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.dashActions}>
+            <button onClick={refreshAll} disabled={loading}>
+              {loading ? "Carregando..." : "Atualizar"}
+            </button>
+            <button onClick={() => setScreen("home")} disabled={loading}>
+              Voltar
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* ADD */}
+      {screen === "add" && (
+        <section className={styles.card}>
+          <div className={styles.formHeaderRow}>
+            <div className={styles.formTitle}>
+              {editingId ? "✏️ Editar lançamento" : "➕ Novo lançamento"}
+            </div>
+            {editingId && (
+              <button className={styles.ghostBtn} onClick={cancelEdit} disabled={loading}>
+                Cancelar edição
+              </button>
+            )}
+          </div>
+
+          <input
+            type="date"
+            value={form.date}
+            onChange={(e) => setForm({ ...form, date: e.target.value })}
+            disabled={loading}
+          />
+
+          <input
+            placeholder="Descrição *"
+            value={form.desc}
+            required
+            onChange={(e) => setForm({ ...form, desc: e.target.value })}
+            disabled={loading}
+          />
+
+          <input
+            placeholder="Valor (ex: 12,50) *"
+            value={form.value}
+            required
+            onChange={(e) => setForm({ ...form, value: e.target.value })}
+            disabled={loading}
+          />
+
+          <select
+            value={form.type}
+            required
+            onChange={(e) => setForm({ ...form, type: e.target.value })}
+            disabled={loading}
+          >
+            <option value="">Tipo *</option>
+            <option>Gasto</option>
+            <option>Recebimento</option>
+          </select>
+
+          <select
+            value={form.nature}
+            required
+            onChange={(e) => setForm({ ...form, nature: e.target.value })}
+            disabled={loading}
+          >
+            <option value="">Natureza *</option>
+            <option>Fixo</option>
+            <option>Variável</option>
+          </select>
+
+          <select
+            value={form.pay}
+            onChange={(e) => setForm({ ...form, pay: e.target.value })}
+            disabled={loading}
+          >
+            <option value="">Pagamento</option>
+            <option>Débito</option>
+            <option>Crédito</option>
+          </select>
+
+          <div className={styles.row2}>
+            <button onClick={save} className={styles.primaryBtn} disabled={loading}>
+              {editingId ? "Salvar alterações" : "Salvar"}
+            </button>
+            <button onClick={() => setScreen("home")} disabled={loading}>
+              Cancelar
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* HIST */}
+      {screen === "hist" && (
+        <section className={styles.card}>
+          {/* ✅ REMOVIDO: seletor de mês repetido aqui */}
+          <div className={styles.searchRow}>
+            <input
+              className={styles.searchInput}
+              placeholder="Buscar por descrição..."
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              disabled={loading}
+            />
+            <button className={styles.clearBtn} onClick={() => setQ("")} disabled={loading || !q}>
+              Limpar
+            </button>
+          </div>
+
+          {itemsFiltrados.length === 0 ? (
+            <div className={styles.empty}>
+              {q ? "Nenhum lançamento encontrado." : "Sem lançamentos neste mês."}
+            </div>
+          ) : (
+            itemsFiltrados.map((it) => (
+              <div key={it.id} className={styles.item}>
+                <div className={styles.itemTop}>
+                  <strong>{it.desc}</strong>
+                  <span className={styles.badge}>{it.type}</span>
+                </div>
+
+                <div className={styles.itemMeta}>
+                  <span>{it.dateBR}</span>
+                  <span className={valueClassByType(it.type)}>{brl(it.value)}</span>
+                </div>
+
+                <div className={styles.itemActions}>
+                  <button onClick={() => startEdit(it)} className={styles.editBtn} disabled={loading}>
+                    Editar
+                  </button>
+                  <button onClick={() => del(it)} className={styles.dangerBtn} disabled={loading}>
+                    Excluir
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+
+          <button onClick={() => setScreen("home")} disabled={loading}>
+            Voltar
+          </button>
+        </section>
+      )}
+
+      {msg && <div className={styles.msg}>{msg}</div>}
+    </div>
+  );
+}
