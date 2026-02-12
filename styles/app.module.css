@@ -21,6 +21,17 @@
   margin:0;
 }
 
+/* ✅ Mobile: topo quebra bonito */
+@media (max-width: 520px){
+  .topbar{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .topbar select{
+    width:100%;
+  }
+}
+
 /* Card base */
 .card{
   background:rgba(17,26,46,.92);
@@ -30,6 +41,18 @@
   box-shadow:0 10px 30px rgba(0,0,0,.25);
   display:grid;
   gap:12px;
+}
+
+/* Inputs e selects (UX melhor no mobile) */
+.card input,
+.card select{
+  width:100%;
+  padding:12px 12px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.06);
+  color:inherit;
+  font-weight:800;
 }
 
 /* Botões da home */
@@ -48,6 +71,11 @@
   background:rgba(110,168,255,.18);
 }
 
+.card button:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
 /* Mensagem */
 .msg{
   margin-top:14px;
@@ -63,6 +91,12 @@
   gap:10px;
 }
 
+@media (max-width: 520px){
+  .row2{
+    grid-template-columns:1fr;
+  }
+}
+
 .primaryBtn{
   background:linear-gradient(180deg,var(--accent),#3b79ff) !important;
   color:#071027 !important;
@@ -73,18 +107,17 @@
   color:#ff6e6e !important;
 }
 
-/* ===== NOVO: CORES DE VALORES (Recebimento/Gasto) ===== */
+/* Cores para valores */
 .valorRecebimento{
   color:#16a34a;
   font-weight:900;
 }
-
 .valorGasto{
   color:#dc2626;
   font-weight:900;
 }
 
-/* ===== HISTÓRICO ===== */
+/* HISTÓRICO */
 .empty{
   color:var(--muted);
   font-weight:900;
@@ -132,33 +165,14 @@
   font-size:13px;
 }
 
-/* ===== NOVO: filtro mês no histórico ===== */
-.filtroMes{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  margin:0 0 12px;
-}
-
-.filtroMes label{
-  font-size:12px;
-  opacity:.85;
-}
-
-.filtroMes select{
-  width:100%;
-  padding:10px 12px;
-  border-radius:10px;
-  border:1px solid rgba(255,255,255,.12);
-  background:rgba(255,255,255,.06);
-  color:inherit;
-}
-
-/* ===== NOVO: ações do item (Editar/Excluir) ===== */
+/* ações do item */
 .itemActions{
   display:flex;
   gap:8px;
   margin-top:10px;
+}
+@media (max-width: 520px){
+  .itemActions{ flex-direction:column; }
 }
 
 .editBtn{
@@ -176,13 +190,16 @@
   filter:brightness(1.05);
 }
 
-/* ===== NOVO: cabeçalho do formulário (modo edição) ===== */
+/* cabeçalho do formulário (modo edição) */
 .formHeaderRow{
   display:flex;
   align-items:center;
   justify-content:space-between;
   gap:10px;
   margin-bottom:10px;
+}
+@media (max-width: 520px){
+  .formHeaderRow{ flex-direction:column; align-items:flex-start; }
 }
 
 .formTitle{
@@ -203,7 +220,7 @@
   background:rgba(255,255,255,.05);
 }
 
-/* ===== DASHBOARD (Nível 1) ===== */
+/* DASHBOARD */
 .dash{
   display:grid;
   gap:14px;
@@ -215,12 +232,8 @@
 }
 
 @media (min-width: 640px){
-  .kpiGrid{
-    grid-template-columns: 1fr 1fr;
-  }
-  .kpiCardWide{
-    grid-column: 1 / -1;
-  }
+  .kpiGrid{ grid-template-columns: 1fr 1fr; }
+  .kpiCardWide{ grid-column: 1 / -1; }
 }
 
 .kpiCard,
@@ -286,7 +299,6 @@
 }
 
 /* Barra dinâmica */
-.barBlue   { background: linear-gradient(90deg, #6ea8ff, #3b79ff); }
 .barYellow { background: linear-gradient(90deg, #ffd166, #ffb703); }
 .barRed    { background: linear-gradient(90deg, #ff6e6e, #ff3b3b); }
 .barGreen  { background: linear-gradient(90deg, #63e6be, #2dd4bf); }
@@ -296,6 +308,9 @@
   grid-template-columns: 1fr 1fr;
   gap:10px;
   margin-top:12px;
+}
+@media (max-width: 520px){
+  .splitGrid{ grid-template-columns:1fr; }
 }
 
 .splitCard{
@@ -322,6 +337,9 @@
   grid-template-columns: 1fr 1fr;
   gap:10px;
 }
+@media (max-width: 520px){
+  .dashActions{ grid-template-columns:1fr; }
+}
 
 .dashActions button{
   width:100%;
@@ -334,28 +352,96 @@
   cursor:pointer;
 }
 
-/* ===== NOVO: linha superior do dashboard com mês ===== */
-.dashTopRow{
+/* ✅ Busca por descrição */
+.searchRow{
   display:flex;
-  align-items:center;
-  justify-content:space-between;
   gap:10px;
 }
-
-.dashMonthPill{
-  font-size:12px;
-  opacity:.85;
-  padding:6px 10px;
-  border-radius:999px;
-  border:1px solid rgba(255,255,255,.12);
-  background:rgba(255,255,255,.06);
-  white-space:nowrap;
+@media (max-width: 520px){
+  .searchRow{ flex-direction:column; }
 }
 
-.monthSelectInline{
-  padding:8px 10px;
-  border-radius:10px;
-  border:1px solid rgba(255,255,255,.12);
-  background:rgba(255,255,255,.06);
-  color:inherit;
+.searchInput{
+  flex:1;
+}
+
+.clearBtn{
+  width:auto !important;
+  padding:12px 14px !important;
+  border-radius:14px !important;
+}
+
+/* ✅ Dashboard anual */
+.yearGrid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+@media (max-width: 520px){
+  .yearGrid{ grid-template-columns:1fr; }
+}
+
+.yearCard,
+.yearCardWide{
+  padding:12px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.03);
+}
+
+.yearCardWide{
+  grid-column:1 / -1;
+}
+
+.yearTitle{
+  font-size:12px;
+  color:var(--muted);
+  font-weight:900;
+}
+
+.yearValue{
+  margin-top:6px;
+  font-size:16px;
+  font-weight:900;
+}
+
+.yearValueBig{
+  margin-top:6px;
+  font-size:22px;
+  font-weight:1000;
+}
+
+.yearList{
+  display:grid;
+  gap:8px;
+  margin-top:12px;
+}
+
+.yearRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.02);
+}
+
+.yearRowLabel{
+  font-weight:900;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.yearRowRight{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-weight:900;
+}
+
+.yearSep{
+  opacity:.5;
 }
