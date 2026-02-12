@@ -3,7 +3,7 @@ import styles from "../styles/app.module.css";
 
 export default function Home() {
   const [screen, setScreen] = useState("home");
-  const [months, setMonths] = useState([]);
+  const [months, setMonths] = useState([]); // ["YYYY-MM", ...]
   const [month, setMonth] = useState("");
   const [items, setItems] = useState([]);
   const [totals, setTotals] = useState({
@@ -15,8 +15,8 @@ export default function Home() {
   });
   const [msg, setMsg] = useState("");
 
-  // edição (histórico)
-  const [editing, setEditing] = useState(null); // { id, sheet }
+  // edição
+  const [editingId, setEditingId] = useState(null);
 
   const [form, setForm] = useState({
     date: todayISO(),
@@ -46,75 +46,11 @@ export default function Home() {
     return j;
   }
 
-  function todayISO() {
-    const d = new Date();
-    return d.toISOString().slice(0, 10);
-  }
-
-  // Mês atual por nome (bate com MONTH_SHEETS)
-  const getMesAtualNome = () => {
-    const map = [
-      "Janeiro",
-      "Fevereiro",
-      "Março",
-      "Abril",
-      "Maio",
-      "Junho",
-      "Julho",
-      "Agosto",
-      "Setembro",
-      "Outubro",
-      "Novembro",
-      "Dezembro",
-    ];
-    return map[new Date().getMonth()];
-  };
-
-  // "Janeiro" -> "Jan/2026"
-  const formatMonthLabel = (monthName) => {
-    const y = new Date().getFullYear();
-    const m = String(monthName || "").toLowerCase();
-
-    const short =
-      m === "janeiro"
-        ? "Jan"
-        : m === "fevereiro"
-        ? "Fev"
-        : m === "março" || m === "marco"
-        ? "Mar"
-        : m === "abril"
-        ? "Abr"
-        : m === "maio"
-        ? "Mai"
-        : m === "junho"
-        ? "Jun"
-        : m === "julho"
-        ? "Jul"
-        : m === "agosto"
-        ? "Ago"
-        : m === "setembro"
-        ? "Set"
-        : m === "outubro"
-        ? "Out"
-        : m === "novembro"
-        ? "Nov"
-        : m === "dezembro"
-        ? "Dez"
-        : monthName;
-
-    return `${short}/${y}`;
-  };
-
   async function init() {
     try {
       const j = await api("init", {});
-      const list = j.months || [];
-      setMonths(list);
-
-      // ✅ mês atual selecionado automaticamente
-      const mesAtual = getMesAtualNome();
-      const existe = list.includes(mesAtual);
-      setMonth(existe ? mesAtual : j.currentMonth || "");
+      setMonths(j.months || []);
+      setMonth(j.currentMonth || "");
     } catch (e) {
       setMsg("❌ " + e.message);
     }
@@ -145,10 +81,28 @@ export default function Home() {
     });
   }
 
+  function todayISO() {
+    const d = new Date();
+    return d.toISOString().slice(0, 10);
+  }
+
+  // YYYY-MM -> Fev/2026
+  const formatMesAno = (ym) => {
+    if (!ym) return "";
+    const [year, mm] = String(ym).split("-");
+    const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+    const nome = meses[(Number(mm) || 1) - 1] || mm;
+    return `${nome}/${year}`;
+  };
+
+  const monthsOptions = useMemo(
+    () => (months || []).map((m) => ({ value: m, label: formatMesAno(m) })),
+    [months]
+  );
+
   // obrigatório: desc, value, type, nature
   function validateForm() {
-    if (!form.desc || !form.value || !form.type || !form.nature) return false;
-    return true;
+    return !!(form.desc && form.value && form.type && form.nature);
   }
 
   function limparCampos() {
@@ -170,11 +124,9 @@ export default function Home() {
         return setMsg("❌ Preencha: descrição, valor, tipo e natureza.");
       }
 
-      if (editing) {
-        // ✅ UPDATE REAL (Apps Script updateEntry_ espera sheet/id e os campos no payload)
+      if (editingId) {
         await api("update", {
-          sheet: editing.sheet,
-          id: editing.id,
+          id: editingId,
           date: form.date,
           desc: form.desc,
           type: form.type,
@@ -182,11 +134,10 @@ export default function Home() {
           pay: form.pay,
           value: form.value,
         });
-
-        setEditing(null);
+        setEditingId(null);
         setMsg("✅ Lançamento atualizado!");
       } else {
-        await api("add", { month, ...form });
+        await api("add", { ...form });
         setMsg("✅ Salvo!");
       }
 
@@ -201,7 +152,7 @@ export default function Home() {
   async function del(it) {
     if (!confirm("Excluir lançamento?")) return;
     try {
-      await api("delete", { id: it.id, sheet: it.sheet });
+      await api("delete", { id: it.id });
       await refresh();
       setMsg("✅ Excluído!");
     } catch (e) {
@@ -210,17 +161,15 @@ export default function Home() {
   }
 
   function brToISO(dateBR) {
-    // dd/mm/aaaa -> aaaa-mm-dd
     if (!dateBR || typeof dateBR !== "string") return todayISO();
     const parts = dateBR.split("/");
     if (parts.length !== 3) return todayISO();
     const [dd, mm, yyyy] = parts;
-    if (!yyyy || !mm || !dd) return todayISO();
     return `${yyyy}-${String(mm).padStart(2, "0")}-${String(dd).padStart(2, "0")}`;
   }
 
   function startEdit(it) {
-    setEditing({ id: it.id, sheet: it.sheet });
+    setEditingId(it.id);
 
     setForm({
       date: it.date ? String(it.date).slice(0, 10) : brToISO(it.dateBR),
@@ -236,7 +185,7 @@ export default function Home() {
   }
 
   function cancelEdit() {
-    setEditing(null);
+    setEditingId(null);
     limparCampos();
     setMsg("");
   }
@@ -248,20 +197,13 @@ export default function Home() {
     return "";
   }
 
-  const monthsOptions = useMemo(() => {
-    return (months || []).map((m) => ({
-      value: m,
-      label: formatMonthLabel(m),
-    }));
-  }, [months]);
-
   return (
     <div className={styles.app}>
       {/* TOPO */}
       <header className={styles.topbar}>
         <h1>Controle Financeiro • JVAZ87</h1>
 
-        {/* ✅ mês selecionado controla histórico e dashboard */}
+        {/* mês selecionado controla histórico e dashboard */}
         <select value={month} onChange={(e) => setMonth(e.target.value)}>
           {monthsOptions.map((m) => (
             <option key={m.value} value={m.value}>
@@ -284,7 +226,7 @@ export default function Home() {
       {screen === "dash" && (
         <section className={styles.dash}>
           <div className={styles.dashTopRow}>
-            <div className={styles.dashMonthPill}>{formatMonthLabel(month)}</div>
+            <div className={styles.dashMonthPill}>{formatMesAno(month)}</div>
 
             <select
               className={styles.monthSelectInline}
@@ -383,10 +325,9 @@ export default function Home() {
         <section className={styles.card}>
           <div className={styles.formHeaderRow}>
             <div className={styles.formTitle}>
-              {editing ? "✏️ Editar lançamento" : "➕ Novo lançamento"}
+              {editingId ? "✏️ Editar lançamento" : "➕ Novo lançamento"}
             </div>
-
-            {editing && (
+            {editingId && (
               <button className={styles.ghostBtn} onClick={cancelEdit}>
                 Cancelar edição
               </button>
@@ -441,7 +382,7 @@ export default function Home() {
 
           <div className={styles.row2}>
             <button onClick={save} className={styles.primaryBtn}>
-              {editing ? "Salvar alterações" : "Salvar"}
+              {editingId ? "Salvar alterações" : "Salvar"}
             </button>
             <button onClick={() => setScreen("home")}>Cancelar</button>
           </div>
@@ -451,7 +392,7 @@ export default function Home() {
       {/* HIST */}
       {screen === "hist" && (
         <section className={styles.card}>
-          {/* filtro por mês (sincroniza dashboard pois muda "month") */}
+          {/* filtro por mês */}
           <div className={styles.filtroMes}>
             <label>Mês</label>
             <select value={month} onChange={(e) => setMonth(e.target.value)}>
