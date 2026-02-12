@@ -1,3 +1,4 @@
+/* Wrapper principal */
 .app{
   min-height:100vh;
   padding:16px 14px 90px;
@@ -5,6 +6,7 @@
   margin:0 auto;
 }
 
+/* Topo */
 .topbar{
   display:flex;
   justify-content:space-between;
@@ -19,29 +21,28 @@
   margin:0;
 }
 
+/* Mobile topo */
 @media (max-width: 520px){
-  .topbar{
-    flex-direction:column;
-    align-items:flex-start;
-  }
-  .topbar select{
-    width:100%;
-  }
+  .topbar{ flex-direction:column; align-items:flex-start; }
+  .topbar select{ width:100%; }
 }
 
+/* Card base */
 .card{
   background:rgba(17,26,46,.92);
   border:1px solid var(--line);
   border-radius:var(--radius);
   padding:14px;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
   display:grid;
   gap:12px;
 }
 
+/* Inputs / selects */
 .card input,
 .card select{
   width:100%;
-  padding:12px;
+  padding:12px 12px;
   border-radius:14px;
   border:1px solid rgba(255,255,255,.12);
   background:rgba(255,255,255,.06);
@@ -49,13 +50,37 @@
   font-weight:800;
 }
 
+/* Botões */
 .card button{
+  width:100%;
   padding:14px;
   border-radius:16px;
   border:1px solid var(--line);
   background:rgba(255,255,255,.04);
   font-weight:900;
+  font-size:16px;
   cursor:pointer;
+}
+
+.card button:hover{ background:rgba(110,168,255,.18); }
+.card button:disabled{ opacity:.6; cursor:not-allowed; }
+
+/* Mensagem */
+.msg{
+  margin-top:14px;
+  font-weight:900;
+  text-align:center;
+  color:var(--muted);
+}
+
+/* Utilitários */
+.row2{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:10px;
+}
+@media (max-width: 520px){
+  .row2{ grid-template-columns:1fr; }
 }
 
 .primaryBtn{
@@ -63,20 +88,19 @@
   color:#071027 !important;
 }
 
-.valorRecebimento{
-  color:#16a34a;
-  font-weight:900;
+.dangerBtn{
+  background:rgba(255,110,110,.2) !important;
+  color:#ff6e6e !important;
 }
 
-.valorGasto{
-  color:#dc2626;
-  font-weight:900;
-}
+/* Cores valores */
+.valorRecebimento{ color:#16a34a; font-weight:900; }
+.valorGasto{ color:#dc2626; font-weight:900; }
 
-.saldoPos { color:#16a34a; }
-.saldoNeg { color:#dc2626; }
-
+/* Histórico */
 .empty{
+  color:var(--muted);
+  font-weight:900;
   text-align:center;
   padding:10px 0;
 }
@@ -93,58 +117,86 @@
 .itemTop{
   display:flex;
   justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+
+.itemTop strong{
+  font-size:15px;
+  font-weight:900;
 }
 
 .badge{
   font-size:12px;
+  font-weight:900;
+  color:var(--muted);
+  border:1px solid var(--line);
   padding:4px 10px;
   border-radius:999px;
-  background:rgba(255,255,255,.1);
+  background:rgba(255,255,255,.02);
 }
 
 .itemMeta{
   display:flex;
   justify-content:space-between;
+  gap:10px;
+  color:var(--muted);
+  font-weight:900;
+  font-size:13px;
 }
 
 .itemActions{
   display:flex;
   gap:8px;
+  margin-top:10px;
+}
+@media (max-width: 520px){
+  .itemActions{ flex-direction:column; }
 }
 
 .editBtn{
-  background:#2563eb;
+  flex:1;
+  background:rgba(37,99,235,.95);
   color:#fff;
   border:none;
-  padding:10px;
+  padding:10px 12px;
   border-radius:10px;
+  font-weight:900;
+  cursor:pointer;
 }
+.editBtn:hover{ filter:brightness(1.05); }
 
-.dangerBtn{
-  background:#dc2626;
-  color:#fff;
-  border:none;
-  padding:10px;
+/* Form header */
+.formHeaderRow{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+@media (max-width: 520px){
+  .formHeaderRow{ flex-direction:column; align-items:flex-start; }
+}
+.formTitle{ font-weight:900; }
+
+.ghostBtn{
+  background:transparent;
+  border:1px solid rgba(255,255,255,.14);
   border-radius:10px;
+  padding:8px 10px;
+  color:inherit;
+  opacity:.9;
+  cursor:pointer;
 }
+.ghostBtn:hover{ background:rgba(255,255,255,.05); }
 
-.dash{
-  display:grid;
-  gap:14px;
-}
+/* Dashboard */
+.dash{ display:grid; gap:14px; }
 
-.kpiGrid{
-  display:grid;
-  gap:12px;
-}
-
-@media (min-width:640px){
-  .kpiGrid{
-    grid-template-columns:1fr 1fr;
-  }
-  .kpiCardWide{
-    grid-column:1/-1;
-  }
+.kpiGrid{ display:grid; gap:12px; }
+@media (min-width: 640px){
+  .kpiGrid{ grid-template-columns: 1fr 1fr; }
+  .kpiCardWide{ grid-column: 1 / -1; }
 }
 
 .kpiCard,
@@ -153,11 +205,14 @@
   border:1px solid var(--line);
   border-radius:var(--radius);
   padding:14px;
+  box-shadow:0 10px 30px rgba(0,0,0,.25);
 }
 
 .kpiLabel{
   font-weight:900;
+  color:var(--muted);
   font-size:13px;
+  letter-spacing:.2px;
 }
 
 .kpiValue{
@@ -172,20 +227,117 @@
   margin-top:6px;
 }
 
-/* ANUAL INLINE */
-.yearInlineGrid{
+.kpiHint{
+  margin-top:6px;
+  font-size:12px;
+  color:var(--muted);
+}
+
+/* Saldo dinâmico */
+.saldoPos { color: #63e6be; }
+.saldoNeg { color: #ff6e6e; }
+
+.barRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:12px;
+  font-size:12px;
+  color:var(--muted);
+  font-weight:900;
+}
+
+.progress{
+  height:12px;
+  border-radius:999px;
+  background:rgba(255,255,255,.06);
+  border:1px solid var(--line);
+  overflow:hidden;
+  margin-top:8px;
+}
+
+.progressFill{
+  height:100%;
+  border-radius:999px;
+}
+
+.barYellow { background: linear-gradient(90deg, #ffd166, #ffb703); }
+.barRed    { background: linear-gradient(90deg, #ff6e6e, #ff3b3b); }
+.barGreen  { background: linear-gradient(90deg, #63e6be, #2dd4bf); }
+
+.splitGrid{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns: 1fr 1fr;
   gap:10px;
   margin-top:12px;
 }
-
-@media (max-width:640px){
-  .yearInlineGrid{
-    grid-template-columns:1fr;
-  }
+@media (max-width: 520px){
+  .splitGrid{ grid-template-columns:1fr; }
 }
 
+.splitCard{
+  padding:12px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.03);
+}
+
+.splitTitle{
+  font-size:12px;
+  color:var(--muted);
+  font-weight:900;
+}
+
+.splitValue{
+  margin-top:6px;
+  font-size:16px;
+  font-weight:900;
+}
+
+.dashActions{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:10px;
+}
+@media (max-width: 520px){
+  .dashActions{ grid-template-columns:1fr; }
+}
+.dashActions button{
+  width:100%;
+  padding:12px;
+  border-radius:16px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.04);
+  font-weight:900;
+  font-size:15px;
+  cursor:pointer;
+}
+
+/* Busca */
+.searchRow{
+  display:flex;
+  gap:10px;
+}
+@media (max-width: 520px){
+  .searchRow{ flex-direction:column; }
+}
+.searchInput{ flex:1; }
+.clearBtn{
+  width:auto !important;
+  padding:12px 14px !important;
+  border-radius:14px !important;
+}
+
+/* ===== ANUAL INLINE (3 cards) ===== */
+.yearInlineGrid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:10px;
+  margin-top:12px;
+}
+@media (max-width: 640px){
+  .yearInlineGrid{ grid-template-columns: 1fr; }
+}
 .yearInlineCard{
   padding:12px;
   border-radius:14px;
@@ -193,25 +345,22 @@
   background:rgba(255,255,255,.03);
   text-align:center;
 }
-
 .yearInlineTitle{
   font-size:12px;
   font-weight:900;
+  color:var(--muted);
 }
-
 .yearInlineValue{
+  margin-top:6px;
   font-size:18px;
   font-weight:1000;
 }
 
-/* ===================================== */
-/* GLASS EFFECT */
-/* ===================================== */
-
+/* ===== GLASS EFFECT ===== */
 .glass{
   background: rgba(255,255,255,.06);
   border: 1px solid rgba(255,255,255,.15);
-  box-shadow: 
+  box-shadow:
     0 12px 34px rgba(0,0,0,.35),
     inset 0 1px 0 rgba(255,255,255,.05);
   backdrop-filter: blur(16px);
@@ -221,34 +370,20 @@
 
 .glass:hover{
   transform: translateY(-2px);
-  box-shadow: 
+  box-shadow:
     0 16px 40px rgba(0,0,0,.45),
     inset 0 1px 0 rgba(255,255,255,.06);
 }
 
-/* Fallback caso navegador não suporte blur */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .glass{
-    background: rgba(17,26,46,.95);
-  }
+  .glass{ background: rgba(17,26,46,.95); }
 }
 
-
-/* ===================================== */
-/* ANIMAÇÃO SUAVE */
-/* ===================================== */
-
+/* ===== ANIMAÇÃO SUAVE ===== */
 .fadeUp{
   animation: fadeUp .28s ease-out both;
 }
-
 @keyframes fadeUp{
-  from{
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to{
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from{ opacity:0; transform: translateY(8px); }
+  to{ opacity:1; transform: translateY(0); }
 }
