@@ -258,8 +258,8 @@
 }
 
 /* Saldo dinâmico */
-.saldoPos { color: #63e6be; }   /* verde */
-.saldoNeg { color: #ff6e6e; }   /* vermelho */
+.saldoPos { color: #63e6be; }
+.saldoNeg { color: #ff6e6e; }
 
 .barRow{
   display:flex;
