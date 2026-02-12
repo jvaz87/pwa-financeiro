@@ -445,3 +445,38 @@
 .yearSep{
   opacity:.5;
 }
+
+/* ===== DASHBOARD ANUAL INLINE ===== */
+
+.yearInlineGrid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:10px;
+  margin-top:12px;
+}
+
+@media (max-width: 640px){
+  .yearInlineGrid{
+    grid-template-columns: 1fr;
+  }
+}
+
+.yearInlineCard{
+  padding:12px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.03);
+  text-align:center;
+}
+
+.yearInlineTitle{
+  font-size:12px;
+  font-weight:900;
+  color:var(--muted);
+}
+
+.yearInlineValue{
+  margin-top:6px;
+  font-size:18px;
+  font-weight:1000;
+}
