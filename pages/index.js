@@ -13,7 +13,22 @@ export default function Home() {
     fixo: 0,
     variavel: 0,
   });
+
+  // Dashboard anual
+  const [yearTotals, setYearTotals] = useState({
+    gasto: 0,
+    recebimento: 0,
+    saldo: 0,
+    fixo: 0,
+    variavel: 0,
+  });
+  const [yearSeries, setYearSeries] = useState([]); // [{month, gasto, recebimento}, ...]
+
   const [msg, setMsg] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // busca no histórico
+  const [q, setQ] = useState("");
 
   // edição
   const [editingId, setEditingId] = useState(null);
@@ -48,29 +63,43 @@ export default function Home() {
 
   async function init() {
     try {
+      setLoading(true);
       const j = await api("init", {});
       setMonths(j.months || []);
       setMonth(j.currentMonth || "");
     } catch (e) {
       setMsg("❌ " + e.message);
+    } finally {
+      setLoading(false);
     }
   }
 
   useEffect(() => {
-    if (month) refresh();
+    if (month) refreshAll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [month]);
 
-  async function refresh() {
+  async function refreshAll() {
     try {
-      const [d, l] = await Promise.all([
+      setLoading(true);
+      setMsg("");
+
+      const year = String(month).split("-")[0];
+
+      const [d, l, y] = await Promise.all([
         api("dashboard", { month }),
         api("list", { month }),
+        api("dashboard_year", { year }),
       ]);
+
       setTotals(d.totals || totals);
       setItems(l.items || []);
+      setYearTotals(y.totals || yearTotals);
+      setYearSeries(y.byMonth || []);
     } catch (e) {
       setMsg("❌ " + e.message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -124,6 +153,8 @@ export default function Home() {
         return setMsg("❌ Preencha: descrição, valor, tipo e natureza.");
       }
 
+      setLoading(true);
+
       if (editingId) {
         await api("update", {
           id: editingId,
@@ -142,21 +173,26 @@ export default function Home() {
       }
 
       limparCampos();
-      await refresh();
+      await refreshAll();
       setScreen("hist");
     } catch (e) {
       setMsg("❌ " + e.message);
+    } finally {
+      setLoading(false);
     }
   }
 
   async function del(it) {
     if (!confirm("Excluir lançamento?")) return;
     try {
+      setLoading(true);
       await api("delete", { id: it.id });
-      await refresh();
+      await refreshAll();
       setMsg("✅ Excluído!");
     } catch (e) {
       setMsg("❌ " + e.message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -197,14 +233,25 @@ export default function Home() {
     return "";
   }
 
+  // histórico filtrado por descrição
+  const itemsFiltrados = useMemo(() => {
+    const term = String(q || "").trim().toLowerCase();
+    if (!term) return items;
+    return (items || []).filter((it) =>
+      String(it.desc || "").toLowerCase().includes(term)
+    );
+  }, [items, q]);
+
+  const selectedYear = useMemo(() => String(month || "").split("-")[0] || "", [month]);
+
   return (
     <div className={styles.app}>
       {/* TOPO */}
       <header className={styles.topbar}>
         <h1>Controle Financeiro • JVAZ87</h1>
 
-        {/* mês selecionado controla histórico e dashboard */}
-        <select value={month} onChange={(e) => setMonth(e.target.value)}>
+        {/* ✅ ÚNICO seletor de mês (vale pro app todo) */}
+        <select value={month} onChange={(e) => setMonth(e.target.value)} disabled={loading}>
           {monthsOptions.map((m) => (
             <option key={m.value} value={m.value}>
               {m.label}
@@ -216,226 +263,18 @@ export default function Home() {
       {/* HOME */}
       {screen === "home" && (
         <section className={styles.card}>
-          <button onClick={() => setScreen("dash")}>📊 Dashboard</button>
-          <button onClick={() => setScreen("add")}>➕ Lançar</button>
-          <button onClick={() => setScreen("hist")}>🧾 Histórico</button>
+          <button onClick={() => setScreen("dash")} disabled={loading}>📊 Dashboard</button>
+          <button onClick={() => setScreen("add")} disabled={loading}>➕ Lançar</button>
+          <button onClick={() => setScreen("hist")} disabled={loading}>🧾 Histórico</button>
         </section>
       )}
 
       {/* DASHBOARD */}
       {screen === "dash" && (
         <section className={styles.dash}>
-          <div className={styles.dashTopRow}>
-            <div className={styles.dashMonthPill}>{formatMesAno(month)}</div>
-
-            <select
-              className={styles.monthSelectInline}
-              value={month}
-              onChange={(e) => setMonth(e.target.value)}
-            >
-              {monthsOptions.map((m) => (
-                <option key={m.value} value={m.value}>
-                  {m.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* ✅ REMOVIDO: seletores repetidos aqui */}
 
           <div className={styles.kpiGrid}>
             <div className={styles.kpiCard}>
               <div className={styles.kpiLabel}>Recebimentos</div>
-              <div className={`${styles.kpiValue} ${styles.valorRecebimento}`}>
-                {brl(totals.recebimento)}
-              </div>
-              <div className={styles.kpiHint}>Total no mês</div>
-            </div>
-
-            <div className={styles.kpiCard}>
-              <div className={styles.kpiLabel}>Gastos</div>
-              <div className={`${styles.kpiValue} ${styles.valorGasto}`}>
-                {brl(totals.gasto)}
-              </div>
-              <div className={styles.kpiHint}>Total no mês</div>
-            </div>
-
-            <div className={styles.kpiCardWide}>
-              <div className={styles.kpiLabel}>Saldo</div>
-
-              <div
-                className={`${styles.kpiValueStrong} ${
-                  Number(totals.saldo || 0) >= 0 ? styles.saldoPos : styles.saldoNeg
-                }`}
-              >
-                {brl(totals.saldo)}
-              </div>
-
-              {(() => {
-                const rec = Number(totals.recebimento || 0);
-                const gas = Number(totals.gasto || 0);
-                const perc = rec > 0 ? Math.min(100, (gas / rec) * 100) : gas > 0 ? 100 : 0;
-
-                return (
-                  <>
-                    <div className={styles.barRow}>
-                      <span className={styles.barLabel}>Gasto / Receb.</span>
-                      <span className={styles.barValue}>
-                        {rec > 0 ? `${Math.round(perc)}%` : gas > 0 ? "100%" : "—"}
-                      </span>
-                    </div>
-
-                    <div className={styles.progress}>
-                      <div
-                        className={`${styles.progressFill} ${
-                          perc >= 80
-                            ? styles.barRed
-                            : perc >= 50
-                            ? styles.barYellow
-                            : styles.barGreen
-                        }`}
-                        style={{ width: `${Math.min(100, Math.round(perc))}%` }}
-                      />
-                    </div>
-
-                    <div className={styles.splitGrid}>
-                      <div className={styles.splitCard}>
-                        <div className={styles.splitTitle}>Fixo</div>
-                        <div className={styles.splitValue}>{brl(totals.fixo)}</div>
-                      </div>
-
-                      <div className={styles.splitCard}>
-                        <div className={styles.splitTitle}>Variável</div>
-                        <div className={styles.splitValue}>{brl(totals.variavel)}</div>
-                      </div>
-                    </div>
-                  </>
-                );
-              })()}
-            </div>
-          </div>
-
-          <div className={styles.dashActions}>
-            <button onClick={refresh}>Atualizar</button>
-            <button onClick={() => setScreen("home")}>Voltar</button>
-          </div>
-        </section>
-      )}
-
-      {/* ADD */}
-      {screen === "add" && (
-        <section className={styles.card}>
-          <div className={styles.formHeaderRow}>
-            <div className={styles.formTitle}>
-              {editingId ? "✏️ Editar lançamento" : "➕ Novo lançamento"}
-            </div>
-            {editingId && (
-              <button className={styles.ghostBtn} onClick={cancelEdit}>
-                Cancelar edição
-              </button>
-            )}
-          </div>
-
-          <input
-            type="date"
-            value={form.date}
-            onChange={(e) => setForm({ ...form, date: e.target.value })}
-          />
-
-          <input
-            placeholder="Descrição *"
-            value={form.desc}
-            required
-            onChange={(e) => setForm({ ...form, desc: e.target.value })}
-          />
-
-          <input
-            placeholder="Valor (ex: 12,50) *"
-            value={form.value}
-            required
-            onChange={(e) => setForm({ ...form, value: e.target.value })}
-          />
-
-          <select
-            value={form.type}
-            required
-            onChange={(e) => setForm({ ...form, type: e.target.value })}
-          >
-            <option value="">Tipo *</option>
-            <option>Gasto</option>
-            <option>Recebimento</option>
-          </select>
-
-          <select
-            value={form.nature}
-            required
-            onChange={(e) => setForm({ ...form, nature: e.target.value })}
-          >
-            <option value="">Natureza *</option>
-            <option>Fixo</option>
-            <option>Variável</option>
-          </select>
-
-          <select value={form.pay} onChange={(e) => setForm({ ...form, pay: e.target.value })}>
-            <option value="">Pagamento</option>
-            <option>Débito</option>
-            <option>Crédito</option>
-          </select>
-
-          <div className={styles.row2}>
-            <button onClick={save} className={styles.primaryBtn}>
-              {editingId ? "Salvar alterações" : "Salvar"}
-            </button>
-            <button onClick={() => setScreen("home")}>Cancelar</button>
-          </div>
-        </section>
-      )}
-
-      {/* HIST */}
-      {screen === "hist" && (
-        <section className={styles.card}>
-          {/* filtro por mês */}
-          <div className={styles.filtroMes}>
-            <label>Mês</label>
-            <select value={month} onChange={(e) => setMonth(e.target.value)}>
-              {monthsOptions.map((m) => (
-                <option key={m.value} value={m.value}>
-                  {m.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {items.length === 0 ? (
-            <div className={styles.empty}>Sem lançamentos neste mês.</div>
-          ) : (
-            items.map((it) => (
-              <div key={it.id} className={styles.item}>
-                <div className={styles.itemTop}>
-                  <strong>{it.desc}</strong>
-                  <span className={styles.badge}>{it.type}</span>
-                </div>
-
-                <div className={styles.itemMeta}>
-                  <span>{it.dateBR}</span>
-                  <span className={valueClassByType(it.type)}>{brl(it.value)}</span>
-                </div>
-
-                <div className={styles.itemActions}>
-                  <button onClick={() => startEdit(it)} className={styles.editBtn}>
-                    Editar
-                  </button>
-                  <button onClick={() => del(it)} className={styles.dangerBtn}>
-                    Excluir
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
-
-          <button onClick={() => setScreen("home")}>Voltar</button>
-        </section>
-      )}
-
-      {msg && <div className={styles.msg}>{msg}</div>}
-    </div>
-  );
-}
+              <div className={`${styles.kpiValue} $
