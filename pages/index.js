@@ -3,8 +3,9 @@ import styles from "../styles/app.module.css";
 
 export default function Home() {
   const [screen, setScreen] = useState("home");
-  const [months, setMonths] = useState([]);
+  const [months, setMonths] = useState([]); // ["YYYY-MM", ...]
   const [month, setMonth] = useState("");
+
   const [items, setItems] = useState([]);
   const [totals, setTotals] = useState({
     gasto: 0,
@@ -14,15 +15,22 @@ export default function Home() {
     variavel: 0,
   });
 
+  // anual (somente totals)
   const [yearTotals, setYearTotals] = useState({
     gasto: 0,
     recebimento: 0,
     saldo: 0,
+    fixo: 0,
+    variavel: 0,
   });
 
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // busca no histórico
   const [q, setQ] = useState("");
+
+  // edição
   const [editingId, setEditingId] = useState(null);
 
   const [form, setForm] = useState({
@@ -35,7 +43,11 @@ export default function Home() {
   });
 
   useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    }
     init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function api(action, data) {
@@ -64,11 +76,14 @@ export default function Home() {
 
   useEffect(() => {
     if (month) refreshAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [month]);
 
   async function refreshAll() {
     try {
       setLoading(true);
+      setMsg("");
+
       const year = String(month).split("-")[0];
 
       const [d, l, y] = await Promise.all([
@@ -77,9 +92,9 @@ export default function Home() {
         api("dashboard_year", { year }),
       ]);
 
-      setTotals(d.totals || {});
+      setTotals(d.totals || totals);
       setItems(l.items || []);
-      setYearTotals(y.totals || {});
+      setYearTotals(y.totals || yearTotals);
     } catch (e) {
       setMsg("❌ " + e.message);
     } finally {
@@ -95,18 +110,21 @@ export default function Home() {
   }
 
   function todayISO() {
-    return new Date().toISOString().slice(0, 10);
+    const d = new Date();
+    return d.toISOString().slice(0, 10);
   }
 
+  // YYYY-MM -> Fev/2026
   const formatMesAno = (ym) => {
     if (!ym) return "";
-    const [year, mm] = ym.split("-");
-    const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
-    return `${meses[(Number(mm) || 1) - 1]}/${year}`;
+    const [year, mm] = String(ym).split("-");
+    const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+    const nome = meses[(Number(mm) || 1) - 1] || mm;
+    return `${nome}/${year}`;
   };
 
   const monthsOptions = useMemo(
-    () => months.map((m) => ({ value: m, label: formatMesAno(m) })),
+    () => (months || []).map((m) => ({ value: m, label: formatMesAno(m) })),
     [months]
   );
 
@@ -115,32 +133,43 @@ export default function Home() {
   }
 
   function limparCampos() {
-    setForm({
+    setForm((prev) => ({
+      ...prev,
       date: todayISO(),
       value: "",
       desc: "",
       type: "",
       nature: "",
-      pay: "",
-    });
+    }));
   }
 
   async function save() {
-    if (!validateForm()) {
-      return setMsg("❌ Preencha todos os campos obrigatórios.");
-    }
-
     try {
+      setMsg("");
+
+      if (!validateForm()) {
+        return setMsg("❌ Preencha: descrição, valor, tipo e natureza.");
+      }
+
       setLoading(true);
+
       if (editingId) {
-        await api("update", { id: editingId, ...form });
-        setMsg("✅ Atualizado!");
+        await api("update", {
+          id: editingId,
+          date: form.date,
+          desc: form.desc,
+          type: form.type,
+          nature: form.nature,
+          pay: form.pay,
+          value: form.value,
+        });
+        setEditingId(null);
+        setMsg("✅ Lançamento atualizado!");
       } else {
-        await api("add", form);
+        await api("add", { ...form });
         setMsg("✅ Salvo!");
       }
 
-      setEditingId(null);
       limparCampos();
       await refreshAll();
       setScreen("hist");
@@ -157,6 +186,7 @@ export default function Home() {
       setLoading(true);
       await api("delete", { id: it.id });
       await refreshAll();
+      setMsg("✅ Excluído!");
     } catch (e) {
       setMsg("❌ " + e.message);
     } finally {
@@ -164,38 +194,58 @@ export default function Home() {
     }
   }
 
+  function brToISO(dateBR) {
+    if (!dateBR || typeof dateBR !== "string") return todayISO();
+    const parts = dateBR.split("/");
+    if (parts.length !== 3) return todayISO();
+    const [dd, mm, yyyy] = parts;
+    return `${yyyy}-${String(mm).padStart(2, "0")}-${String(dd).padStart(2, "0")}`;
+  }
+
   function startEdit(it) {
     setEditingId(it.id);
+
     setForm({
-      date: it.date,
-      value: it.value,
-      desc: it.desc,
-      type: it.type,
-      nature: it.nature,
-      pay: it.pay,
+      date: it.date ? String(it.date).slice(0, 10) : brToISO(it.dateBR),
+      value: it.value ?? "",
+      desc: it.desc ?? "",
+      type: it.type ?? "",
+      nature: it.nature ?? "",
+      pay: it.pay ?? "",
     });
+
+    setMsg("✏️ Editando lançamento...");
     setScreen("add");
   }
 
+  function cancelEdit() {
+    setEditingId(null);
+    limparCampos();
+    setMsg("");
+  }
+
+  function valueClassByType(type) {
+    const t = String(type || "").toLowerCase();
+    if (t.includes("receb")) return styles.valorRecebimento;
+    if (t.includes("gasto")) return styles.valorGasto;
+    return "";
+  }
+
   const itemsFiltrados = useMemo(() => {
-    const term = q.toLowerCase();
-    return items.filter((it) =>
-      it.desc.toLowerCase().includes(term)
-    );
+    const term = String(q || "").trim().toLowerCase();
+    if (!term) return items;
+    return (items || []).filter((it) => String(it.desc || "").toLowerCase().includes(term));
   }, [items, q]);
 
-  const selectedYear = String(month).split("-")[0];
+  const selectedYear = useMemo(() => String(month || "").split("-")[0] || "", [month]);
 
   return (
     <div className={styles.app}>
+      {/* TOPO */}
       <header className={styles.topbar}>
         <h1>Controle Financeiro • JVAZ87</h1>
 
-        <select
-          value={month}
-          onChange={(e) => setMonth(e.target.value)}
-          disabled={loading}
-        >
+        <select value={month} onChange={(e) => setMonth(e.target.value)} disabled={loading}>
           {monthsOptions.map((m) => (
             <option key={m.value} value={m.value}>
               {m.label}
@@ -207,9 +257,9 @@ export default function Home() {
       {/* HOME */}
       {screen === "home" && (
         <section className={styles.card}>
-          <button onClick={() => setScreen("dash")}>📊 Dashboard</button>
-          <button onClick={() => setScreen("add")}>➕ Lançar</button>
-          <button onClick={() => setScreen("hist")}>🧾 Histórico</button>
+          <button onClick={() => setScreen("dash")} disabled={loading}>📊 Dashboard</button>
+          <button onClick={() => setScreen("add")} disabled={loading}>➕ Lançar</button>
+          <button onClick={() => setScreen("hist")} disabled={loading}>🧾 Histórico</button>
         </section>
       )}
 
@@ -222,56 +272,92 @@ export default function Home() {
               <div className={`${styles.kpiValue} ${styles.valorRecebimento}`}>
                 {brl(totals.recebimento)}
               </div>
+              <div className={styles.kpiHint}>Total no mês</div>
             </div>
 
             <div className={`${styles.kpiCard} ${styles.glass}`}>
-              <div className={`${styles.kpiLabel}`}>Gastos</div>
+              <div className={styles.kpiLabel}>Gastos</div>
               <div className={`${styles.kpiValue} ${styles.valorGasto}`}>
                 {brl(totals.gasto)}
               </div>
+              <div className={styles.kpiHint}>Total no mês</div>
             </div>
 
-            <div className={`${styles.kpiCardWide} ${styles.glass}`}
+            <div className={`${styles.kpiCardWide} ${styles.glass}`}>
               <div className={styles.kpiLabel}>Saldo</div>
+
               <div
                 className={`${styles.kpiValueStrong} ${
-                  totals.saldo >= 0
-                    ? styles.saldoPos
-                    : styles.saldoNeg
+                  Number(totals.saldo || 0) >= 0 ? styles.saldoPos : styles.saldoNeg
                 }`}
               >
                 {brl(totals.saldo)}
               </div>
+
+              {/* ✅ BARRA gasto x recebimento (voltou) */}
+              {(() => {
+                const rec = Number(totals.recebimento || 0);
+                const gas = Number(totals.gasto || 0);
+                const perc = rec > 0 ? Math.min(100, (gas / rec) * 100) : gas > 0 ? 100 : 0;
+
+                return (
+                  <>
+                    <div className={styles.barRow}>
+                      <span className={styles.barLabel}>Gasto / Receb.</span>
+                      <span className={styles.barValue}>
+                        {rec > 0 ? `${Math.round(perc)}%` : gas > 0 ? "100%" : "—"}
+                      </span>
+                    </div>
+
+                    <div className={styles.progress}>
+                      <div
+                        className={`${styles.progressFill} ${
+                          perc >= 80 ? styles.barRed : perc >= 50 ? styles.barYellow : styles.barGreen
+                        }`}
+                        style={{ width: `${Math.min(100, Math.round(perc))}%` }}
+                      />
+                    </div>
+
+                    <div className={styles.splitGrid}>
+                      <div className={styles.splitCard}>
+                        <div className={styles.splitTitle}>Fixo</div>
+                        <div className={styles.splitValue}>{brl(totals.fixo)}</div>
+                      </div>
+
+                      <div className={styles.splitCard}>
+                        <div className={styles.splitTitle}>Variável</div>
+                        <div className={styles.splitValue}>{brl(totals.variavel)}</div>
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
             </div>
 
-            {/* ANUAL SIMPLIFICADO */}
-            <div className={`${styles.kpiCardWide} ${styles.glass}`}
-              <div className={styles.kpiLabel}>
-                Resumo do ano • {selectedYear}
-              </div>
+            {/* ✅ ANUAL LIMPO: 3 cards inline */}
+            <div className={`${styles.kpiCardWide} ${styles.glass}`}>
+              <div className={styles.kpiLabel}>Resumo do ano • {selectedYear}</div>
 
               <div className={styles.yearInlineGrid}>
-                <div className={`${styles.yearInlineCard} ${styles.glass}`}
+                <div className={`${styles.yearInlineCard} ${styles.glass}`}>
                   <div className={styles.yearInlineTitle}>Recebimentos</div>
                   <div className={`${styles.yearInlineValue} ${styles.valorRecebimento}`}>
                     {brl(yearTotals.recebimento)}
                   </div>
                 </div>
 
-                <div className={`${styles.yearInlineCard} ${styles.glass}`}
+                <div className={`${styles.yearInlineCard} ${styles.glass}`}>
                   <div className={styles.yearInlineTitle}>Gastos</div>
                   <div className={`${styles.yearInlineValue} ${styles.valorGasto}`}>
                     {brl(yearTotals.gasto)}
                   </div>
                 </div>
 
-                <div className={styles.yearInlineCard}>
+                <div className={`${styles.yearInlineCard} ${styles.glass}`}>
                   <div className={styles.yearInlineTitle}>Saldo</div>
                   <div
                     className={`${styles.yearInlineValue} ${
-                      yearTotals.saldo >= 0
-                        ? styles.saldoPos
-                        : styles.saldoNeg
+                      Number(yearTotals.saldo || 0) >= 0 ? styles.saldoPos : styles.saldoNeg
                     }`}
                   >
                     {brl(yearTotals.saldo)}
@@ -282,24 +368,116 @@ export default function Home() {
           </div>
 
           <div className={styles.dashActions}>
-            <button onClick={refreshAll}>Atualizar</button>
-            <button onClick={() => setScreen("home")}>Voltar</button>
+            <button onClick={refreshAll} disabled={loading}>
+              {loading ? "Carregando..." : "Atualizar"}
+            </button>
+            <button onClick={() => setScreen("home")} disabled={loading}>
+              Voltar
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* ✅ LANÇAR (voltou completo) */}
+      {screen === "add" && (
+        <section className={`${styles.card} ${styles.fadeUp}`}>
+          <div className={styles.formHeaderRow}>
+            <div className={styles.formTitle}>
+              {editingId ? "✏️ Editar lançamento" : "➕ Novo lançamento"}
+            </div>
+            {editingId && (
+              <button className={styles.ghostBtn} onClick={cancelEdit} disabled={loading}>
+                Cancelar edição
+              </button>
+            )}
+          </div>
+
+          <input
+            type="date"
+            value={form.date}
+            onChange={(e) => setForm({ ...form, date: e.target.value })}
+            disabled={loading}
+          />
+
+          <input
+            placeholder="Descrição *"
+            value={form.desc}
+            required
+            onChange={(e) => setForm({ ...form, desc: e.target.value })}
+            disabled={loading}
+          />
+
+          <input
+            placeholder="Valor (ex: 12,50) *"
+            value={form.value}
+            required
+            onChange={(e) => setForm({ ...form, value: e.target.value })}
+            disabled={loading}
+          />
+
+          <select
+            value={form.type}
+            required
+            onChange={(e) => setForm({ ...form, type: e.target.value })}
+            disabled={loading}
+          >
+            <option value="">Tipo *</option>
+            <option>Gasto</option>
+            <option>Recebimento</option>
+          </select>
+
+          <select
+            value={form.nature}
+            required
+            onChange={(e) => setForm({ ...form, nature: e.target.value })}
+            disabled={loading}
+          >
+            <option value="">Natureza *</option>
+            <option>Fixo</option>
+            <option>Variável</option>
+          </select>
+
+          <select
+            value={form.pay}
+            onChange={(e) => setForm({ ...form, pay: e.target.value })}
+            disabled={loading}
+          >
+            <option value="">Pagamento</option>
+            <option>Débito</option>
+            <option>Crédito</option>
+          </select>
+
+          <div className={styles.row2}>
+            <button onClick={save} className={styles.primaryBtn} disabled={loading}>
+              {editingId ? "Salvar alterações" : "Salvar"}
+            </button>
+            <button onClick={() => setScreen("home")} disabled={loading}>
+              Cancelar
+            </button>
           </div>
         </section>
       )}
 
       {/* HIST */}
       {screen === "hist" && (
-        <section className={styles.card}>
-          <input
-            className={styles.searchInput}
-            placeholder="Buscar por descrição..."
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-          />
+        <section className={`${styles.card} ${styles.fadeUp}`}>
+          <div className={styles.searchRow}>
+            <input
+              className={styles.searchInput}
+              placeholder="Buscar por descrição..."
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              disabled={loading}
+            />
+            <button className={styles.clearBtn} onClick={() => setQ("")} disabled={loading || !q}>
+              Limpar
+            </button>
+          </div>
 
           {itemsFiltrados.length === 0 ? (
-            <div className={styles.empty}>Sem lançamentos.</div>
+            <div className={styles.empty}>
+              {q ? "Nenhum lançamento encontrado." : "Sem lançamentos neste mês."}
+            </div>
           ) : (
             itemsFiltrados.map((it) => (
               <div key={it.id} className={styles.item}>
@@ -310,16 +488,14 @@ export default function Home() {
 
                 <div className={styles.itemMeta}>
                   <span>{it.dateBR}</span>
-                  <span className={it.type === "Recebimento" ? styles.valorRecebimento : styles.valorGasto}>
-                    {brl(it.value)}
-                  </span>
+                  <span className={valueClassByType(it.type)}>{brl(it.value)}</span>
                 </div>
 
                 <div className={styles.itemActions}>
-                  <button onClick={() => startEdit(it)} className={styles.editBtn}>
+                  <button onClick={() => startEdit(it)} className={styles.editBtn} disabled={loading}>
                     Editar
                   </button>
-                  <button onClick={() => del(it)} className={styles.dangerBtn}>
+                  <button onClick={() => del(it)} className={styles.dangerBtn} disabled={loading}>
                     Excluir
                   </button>
                 </div>
@@ -327,10 +503,13 @@ export default function Home() {
             ))
           )}
 
-          <button onClick={() => setScreen("home")}>Voltar</button>
+          <button onClick={() => setScreen("home")} disabled={loading}>
+            Voltar
+          </button>
         </section>
       )}
+
+      {msg && <div className={styles.msg}>{msg}</div>}
     </div>
   );
 }
-
