@@ -346,36 +346,42 @@ export default function Home() {
               })()}
             </div>
 
-            {/* ✅ DASHBOARD ANUAL */}
-            <div className={styles.kpiCardWide}>
-              <div className={styles.kpiLabel}>Resumo do ano • {selectedYear}</div>
+            {/* DASHBOARD ANUAL LIMPO */}
+<div className={styles.kpiCardWide}>
+  <div className={styles.kpiLabel}>
+    Resumo do ano • {selectedYear}
+  </div>
 
-              <div className={styles.yearGrid}>
-                <div className={styles.yearCard}>
-                  <div className={styles.yearTitle}>Recebimentos</div>
-                  <div className={`${styles.yearValue} ${styles.valorRecebimento}`}>
-                    {brl(yearTotals.recebimento)}
-                  </div>
-                </div>
+  <div className={styles.yearInlineGrid}>
+    <div className={styles.yearInlineCard}>
+      <div className={styles.yearInlineTitle}>Recebimentos</div>
+      <div className={`${styles.yearInlineValue} ${styles.valorRecebimento}`}>
+        {brl(yearTotals.recebimento)}
+      </div>
+    </div>
 
-                <div className={styles.yearCard}>
-                  <div className={styles.yearTitle}>Gastos</div>
-                  <div className={`${styles.yearValue} ${styles.valorGasto}`}>
-                    {brl(yearTotals.gasto)}
-                  </div>
-                </div>
+    <div className={styles.yearInlineCard}>
+      <div className={styles.yearInlineTitle}>Gastos</div>
+      <div className={`${styles.yearInlineValue} ${styles.valorGasto}`}>
+        {brl(yearTotals.gasto)}
+      </div>
+    </div>
 
-                <div className={styles.yearCardWide}>
-                  <div className={styles.yearTitle}>Saldo</div>
-                  <div
-                    className={`${styles.yearValueBig} ${
-                      Number(yearTotals.saldo || 0) >= 0 ? styles.saldoPos : styles.saldoNeg
-                    }`}
-                  >
-                    {brl(yearTotals.saldo)}
-                  </div>
-                </div>
-              </div>
+    <div className={styles.yearInlineCard}>
+      <div className={styles.yearInlineTitle}>Saldo</div>
+      <div
+        className={`${styles.yearInlineValue} ${
+          Number(yearTotals.saldo || 0) >= 0
+            ? styles.saldoPos
+            : styles.saldoNeg
+        }`}
+      >
+        {brl(yearTotals.saldo)}
+      </div>
+    </div>
+  </div>
+</div>
+
 
               {/* mini lista por mês */}
               <div className={styles.yearList}>
@@ -540,3 +546,4 @@ export default function Home() {
     </div>
   );
 }
+
