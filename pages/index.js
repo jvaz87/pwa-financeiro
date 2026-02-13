@@ -45,7 +45,7 @@ export default function Home() {
   });
 
   useEffect(() => {
-    // ✅ Tema: carrega preferencia (ou sistema)
+    // ✅ Tema: carrega preferencia (ou sistema) e já seta theme-color
     try {
       const saved = localStorage.getItem("theme");
       if (saved === "dark" || saved === "light") {
@@ -89,7 +89,6 @@ export default function Home() {
   function applyTheme(next) {
     if (typeof document === "undefined") return;
 
-    // aplica no html e body
     document.documentElement.setAttribute("data-theme", next);
     document.body.setAttribute("data-theme", next);
 
@@ -175,7 +174,7 @@ export default function Home() {
   const formatMesAno = (ym) => {
     if (!ym) return "";
     const [year, mm] = String(ym).split("-");
-    const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+    const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
     const nome = meses[(Number(mm) || 1) - 1] || mm;
     return `${nome}/${year}`;
   };
@@ -261,7 +260,6 @@ export default function Home() {
 
   function startEdit(it) {
     setEditingId(it.id);
-
     setForm({
       date: it.date ? String(it.date).slice(0, 10) : brToISO(it.dateBR),
       value: it.value ?? "",
@@ -270,7 +268,6 @@ export default function Home() {
       nature: it.nature ?? "",
       pay: it.pay ?? "",
     });
-
     setMsg("✏️ Editando lançamento...");
     setScreen("add");
   }
@@ -364,7 +361,6 @@ export default function Home() {
                 {brl(totals.saldo)}
               </div>
 
-              {/* Barra gasto/recebimento */}
               {(() => {
                 const rec = Number(totals.recebimento || 0);
                 const gas = Number(totals.gasto || 0);
@@ -404,7 +400,7 @@ export default function Home() {
               })()}
             </div>
 
-            {/* ANUAL (limpo) */}
+            {/* ANUAL INLINE */}
             <div className={`${styles.kpiCardWide} ${styles.glass}`}>
               <div className={styles.kpiLabel}>Resumo do ano • {selectedYear}</div>
 
@@ -558,7 +554,7 @@ export default function Home() {
 
                 <div className={styles.itemMeta}>
                   <span>{it.dateBR}</span>
-                  <span className={valueClassByType(it.type)}>{brl(it.value)}</span>
+                  <span className={valueClassByType(it.type)}>{it.value ? brl(it.value) : brl(0)}</span>
                 </div>
 
                 <div className={styles.itemActions}>
