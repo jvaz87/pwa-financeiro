@@ -144,8 +144,175 @@
   border:none !important;
 }
 
+/* cores */
 .valorRecebimento{ color:#16a34a; font-weight:1000; }
 .valorGasto{ color:#dc2626; font-weight:1000; }
+
+/* =========================
+   SALDO (verde diferente + negrito)
+   ========================= */
+.saldoStrong{
+  font-weight:1200;
+  letter-spacing:-0.2px;
+}
+
+.saldoPos2{
+  color:#2dd4bf; /* tom teal premium */
+}
+
+.saldoNeg{
+  color:#dc2626;
+}
+
+/* =========================
+   DASHBOARD
+   ========================= */
+.dash{ display:grid; gap:14px; }
+.kpiGrid{ display:grid; gap:12px; }
+
+@media (min-width: 640px){
+  .kpiGrid{ grid-template-columns: 1fr 1fr; }
+  .kpiCardWide{ grid-column: 1 / -1; }
+}
+
+.kpiCard,
+.kpiCardWide{
+  background: var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:14px;
+  box-shadow:0 10px 30px rgba(0,0,0,.18);
+}
+
+.kpiLabel{
+  font-weight:900;
+  color:var(--muted);
+  font-size:13px;
+  letter-spacing:.2px;
+}
+
+.kpiValue{
+  font-size:22px;
+  font-weight:1000;
+  margin-top:6px;
+}
+
+.kpiValueStrong{
+  font-size:30px;
+  font-weight:1100;
+  margin-top:6px;
+}
+
+.kpiHint{
+  margin-top:6px;
+  font-size:12px;
+  color:var(--muted);
+  font-weight:900;
+}
+
+/* Subtotais dentro dos cards (Fixo/Variável) */
+.kpiSubRow{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px solid var(--line);
+}
+
+.kpiSubItem{
+  flex:1;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  padding:8px 10px;
+  border-radius:12px;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.06);
+}
+
+.kpiSubLabel{
+  font-size:12px;
+  font-weight:900;
+  color:var(--muted);
+}
+
+.kpiSubValue{
+  font-size:12px;
+  font-weight:1000;
+  opacity:.95;
+}
+
+html[data-theme="light"] .kpiSubItem,
+body[data-theme="light"] .kpiSubItem{
+  background: rgba(11,19,36,.03);
+  border: 1px solid rgba(11,19,36,.06);
+}
+
+.barRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-top:12px;
+  font-size:12px;
+  color:var(--muted);
+  font-weight:900;
+}
+
+.progress{
+  height:12px;
+  border-radius:999px;
+  background:rgba(255,255,255,.08);
+  border:1px solid var(--line);
+  overflow:hidden;
+  margin-top:8px;
+}
+
+.progressFill{
+  height:100%;
+  border-radius:999px;
+}
+
+.barYellow { background: linear-gradient(90deg, #ffd166, #ffb703); }
+.barRed    { background: linear-gradient(90deg, #ff6e6e, #ff3b3b); }
+.barGreen  { background: linear-gradient(90deg, #63e6be, #2dd4bf); }
+
+.dashActions{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:10px;
+}
+@media (max-width: 520px){
+  .dashActions{ grid-template-columns:1fr; }
+}
+
+/* anual inline */
+.yearInlineGrid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:10px;
+  margin-top:12px;
+}
+@media (max-width: 640px){
+  .yearInlineGrid{ grid-template-columns: 1fr; }
+}
+.yearInlineCard{
+  padding:12px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.03);
+  text-align:center;
+}
+.yearInlineTitle{
+  font-size:12px;
+  font-weight:900;
+  color:var(--muted);
+}
+.yearInlineValue{
+  margin-top:6px;
+  font-size:18px;
+  font-weight:1100;
+}
 
 /* =========================
    HISTÓRICO PREMIUM
@@ -282,155 +449,21 @@
   transform: scale(.98);
 }
 
-/* Editar */
 .editBtn{
   background: rgba(37,99,235,.12);
   border-color: rgba(37,99,235,.25);
   color:#1d4ed8;
 }
 
-/* Excluir */
 .deleteBtn{
   background: rgba(220,38,38,.10);
   border-color: rgba(220,38,38,.22);
   color:#b91c1c;
 }
 
-/* ===== DASHBOARD ===== */
-.dash{ display:grid; gap:14px; }
-.kpiGrid{ display:grid; gap:12px; }
-
-@media (min-width: 640px){
-  .kpiGrid{ grid-template-columns: 1fr 1fr; }
-  .kpiCardWide{ grid-column: 1 / -1; }
-}
-
-.kpiCard,
-.kpiCardWide{
-  background: var(--card);
-  border:1px solid var(--line);
-  border-radius:var(--radius);
-  padding:14px;
-  box-shadow:0 10px 30px rgba(0,0,0,.18);
-}
-
-.kpiLabel{
-  font-weight:900;
-  color:var(--muted);
-  font-size:13px;
-  letter-spacing:.2px;
-}
-
-.kpiValue{
-  font-size:22px;
-  font-weight:1000;
-  margin-top:6px;
-}
-
-.kpiValueStrong{
-  font-size:30px;
-  font-weight:1100;
-  margin-top:6px;
-}
-
-.saldoPos { color: #16a34a; }
-.saldoNeg { color: #dc2626; }
-
-.barRow{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-top:12px;
-  font-size:12px;
-  color:var(--muted);
-  font-weight:900;
-}
-
-.progress{
-  height:12px;
-  border-radius:999px;
-  background:rgba(255,255,255,.08);
-  border:1px solid var(--line);
-  overflow:hidden;
-  margin-top:8px;
-}
-
-.progressFill{
-  height:100%;
-  border-radius:999px;
-}
-
-.barYellow { background: linear-gradient(90deg, #ffd166, #ffb703); }
-.barRed    { background: linear-gradient(90deg, #ff6e6e, #ff3b3b); }
-.barGreen  { background: linear-gradient(90deg, #63e6be, #2dd4bf); }
-
-.splitGrid{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:10px;
-  margin-top:12px;
-}
-@media (max-width: 520px){
-  .splitGrid{ grid-template-columns:1fr; }
-}
-
-.splitCard{
-  padding:12px;
-  border-radius:14px;
-  border:1px solid var(--line);
-  background:rgba(255,255,255,.03);
-}
-
-.splitTitle{
-  font-size:12px;
-  color:var(--muted);
-  font-weight:900;
-}
-
-.splitValue{
-  margin-top:6px;
-  font-size:16px;
-  font-weight:900;
-}
-
-.dashActions{
-  display:grid;
-  grid-template-columns: 1fr 1fr;
-  gap:10px;
-}
-@media (max-width: 520px){
-  .dashActions{ grid-template-columns:1fr; }
-}
-
-/* anual inline */
-.yearInlineGrid{
-  display:grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap:10px;
-  margin-top:12px;
-}
-@media (max-width: 640px){
-  .yearInlineGrid{ grid-template-columns: 1fr; }
-}
-.yearInlineCard{
-  padding:12px;
-  border-radius:14px;
-  border:1px solid var(--line);
-  background:rgba(255,255,255,.03);
-  text-align:center;
-}
-.yearInlineTitle{
-  font-size:12px;
-  font-weight:900;
-  color:var(--muted);
-}
-.yearInlineValue{
-  margin-top:6px;
-  font-size:18px;
-  font-weight:1100;
-}
-
-/* Glass */
+/* =========================
+   GLASS + ANIMAÇÃO
+   ========================= */
 .glass{
   background: rgba(255,255,255,.08);
   border: 1px solid rgba(255,255,255,.16);
