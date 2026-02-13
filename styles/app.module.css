@@ -197,15 +197,38 @@
 
 .editBtn{
   flex:1;
-  background:rgba(37,99,235,.95);
-  color:#fff !important;
-  border:none !important;
   padding:10px 12px;
   border-radius:10px;
   font-weight:900;
   cursor:pointer;
+  border:none;
+
+  /* padrão dark */
+  background: rgba(110,168,255,.15);
+  color: var(--accent);
+  border: 1px solid rgba(110,168,255,.35);
+
+  transition: all 220ms ease;
 }
-.editBtn:hover{ filter:brightness(1.05); }
+
+.editBtn:hover{
+  background: rgba(110,168,255,.25);
+  transform: translateY(-1px);
+}
+
+/* ===== MODO CLARO ===== */
+html[data-theme="light"] .editBtn,
+body[data-theme="light"] .editBtn{
+  background: rgba(37,99,235,.12);
+  color: #1d4ed8;
+  border: 1px solid rgba(37,99,235,.35);
+}
+
+html[data-theme="light"] .editBtn:hover,
+body[data-theme="light"] .editBtn:hover{
+  background: rgba(37,99,235,.18);
+}
+
 
 /* DASH */
 .dash{ display:grid; gap:14px; }
@@ -415,3 +438,4 @@
     font-size:20px;
   }
 }
+
