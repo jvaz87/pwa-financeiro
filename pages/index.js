@@ -13,6 +13,8 @@ export default function Home() {
     saldo: 0,
     fixo: 0,
     variavel: 0,
+    fixoReceb: 0,
+    variavelReceb: 0,
   });
 
   const [yearTotals, setYearTotals] = useState({
@@ -21,6 +23,8 @@ export default function Home() {
     saldo: 0,
     fixo: 0,
     variavel: 0,
+    fixoReceb: 0,
+    variavelReceb: 0,
   });
 
   const [msg, setMsg] = useState("");
@@ -174,7 +178,7 @@ export default function Home() {
   const formatMesAno = (ym) => {
     if (!ym) return "";
     const [year, mm] = String(ym).split("-");
-    const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+    const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
     const nome = meses[(Number(mm) || 1) - 1] || mm;
     return `${nome}/${year}`;
   };
@@ -302,15 +306,10 @@ export default function Home() {
   const itemsFiltrados = useMemo(() => {
     const term = String(q || "").trim().toLowerCase();
     if (!term) return items;
-    return (items || []).filter((it) =>
-      String(it.desc || "").toLowerCase().includes(term)
-    );
+    return (items || []).filter((it) => String(it.desc || "").toLowerCase().includes(term));
   }, [items, q]);
 
-  const selectedYear = useMemo(
-    () => String(month || "").split("-")[0] || "",
-    [month]
-  );
+  const selectedYear = useMemo(() => String(month || "").split("-")[0] || "", [month]);
 
   return (
     <div className={styles.app}>
@@ -333,11 +332,7 @@ export default function Home() {
             {theme === "dark" ? "☀️" : "🌙"}
           </button>
 
-          <select
-            value={month}
-            onChange={(e) => setMonth(e.target.value)}
-            disabled={loading}
-          >
+          <select value={month} onChange={(e) => setMonth(e.target.value)} disabled={loading}>
             {monthsOptions.map((m) => (
               <option key={m.value} value={m.value}>
                 {m.label}
@@ -350,15 +345,9 @@ export default function Home() {
       {/* HOME */}
       {screen === "home" && (
         <section className={styles.card}>
-          <button onClick={() => setScreen("dash")} disabled={loading}>
-            📊 Dashboard
-          </button>
-          <button onClick={() => setScreen("add")} disabled={loading}>
-            ➕ Lançar
-          </button>
-          <button onClick={() => setScreen("hist")} disabled={loading}>
-            🧾 Histórico
-          </button>
+          <button onClick={() => setScreen("dash")} disabled={loading}>📊 Dashboard</button>
+          <button onClick={() => setScreen("add")} disabled={loading}>➕ Lançar</button>
+          <button onClick={() => setScreen("hist")} disabled={loading}>🧾 Histórico</button>
         </section>
       )}
 
@@ -366,28 +355,53 @@ export default function Home() {
       {screen === "dash" && (
         <section key={month} className={`${styles.dash} ${styles.fadeUp}`}>
           <div className={styles.kpiGrid}>
+            {/* RECEBIMENTOS (com fixo/variável dentro) */}
             <div className={`${styles.kpiCard} ${styles.glass}`}>
               <div className={styles.kpiLabel}>Recebimentos</div>
               <div className={`${styles.kpiValue} ${styles.valorRecebimento}`}>
                 {brl(totals.recebimento)}
               </div>
               <div className={styles.kpiHint}>Total no mês</div>
+
+              <div className={styles.kpiSubRow}>
+                <div className={styles.kpiSubItem}>
+                  <span className={styles.kpiSubLabel}>Fixo</span>
+                  <span className={styles.kpiSubValue}>{brl(totals.fixoReceb || 0)}</span>
+                </div>
+                <div className={styles.kpiSubItem}>
+                  <span className={styles.kpiSubLabel}>Variável</span>
+                  <span className={styles.kpiSubValue}>{brl(totals.variavelReceb || 0)}</span>
+                </div>
+              </div>
             </div>
 
+            {/* GASTOS (com fixo/variável dentro) */}
             <div className={`${styles.kpiCard} ${styles.glass}`}>
               <div className={styles.kpiLabel}>Gastos</div>
               <div className={`${styles.kpiValue} ${styles.valorGasto}`}>
                 {brl(totals.gasto)}
               </div>
               <div className={styles.kpiHint}>Total no mês</div>
+
+              <div className={styles.kpiSubRow}>
+                <div className={styles.kpiSubItem}>
+                  <span className={styles.kpiSubLabel}>Fixo</span>
+                  <span className={styles.kpiSubValue}>{brl(totals.fixo || 0)}</span>
+                </div>
+                <div className={styles.kpiSubItem}>
+                  <span className={styles.kpiSubLabel}>Variável</span>
+                  <span className={styles.kpiSubValue}>{brl(totals.variavel || 0)}</span>
+                </div>
+              </div>
             </div>
 
+            {/* SALDO (sem fixo/variável) */}
             <div className={`${styles.kpiCardWide} ${styles.glass}`}>
               <div className={styles.kpiLabel}>Saldo</div>
 
               <div
-                className={`${styles.kpiValueStrong} ${
-                  Number(totals.saldo || 0) >= 0 ? styles.saldoPos : styles.saldoNeg
+                className={`${styles.kpiValueStrong} ${styles.saldoStrong} ${
+                  Number(totals.saldo || 0) >= 0 ? styles.saldoPos2 : styles.saldoNeg
                 }`}
               >
                 {brl(totals.saldo)}
@@ -396,8 +410,7 @@ export default function Home() {
               {(() => {
                 const rec = Number(totals.recebimento || 0);
                 const gas = Number(totals.gasto || 0);
-                const perc =
-                  rec > 0 ? Math.min(100, (gas / rec) * 100) : gas > 0 ? 100 : 0;
+                const perc = rec > 0 ? Math.min(100, (gas / rec) * 100) : gas > 0 ? 100 : 0;
 
                 return (
                   <>
@@ -411,26 +424,10 @@ export default function Home() {
                     <div className={styles.progress}>
                       <div
                         className={`${styles.progressFill} ${
-                          perc >= 80
-                            ? styles.barRed
-                            : perc >= 50
-                            ? styles.barYellow
-                            : styles.barGreen
+                          perc >= 80 ? styles.barRed : perc >= 50 ? styles.barYellow : styles.barGreen
                         }`}
                         style={{ width: `${Math.min(100, Math.round(perc))}%` }}
                       />
-                    </div>
-
-                    <div className={styles.splitGrid}>
-                      <div className={styles.splitCard}>
-                        <div className={styles.splitTitle}>Fixo</div>
-                        <div className={styles.splitValue}>{brl(totals.fixo)}</div>
-                      </div>
-
-                      <div className={styles.splitCard}>
-                        <div className={styles.splitTitle}>Variável</div>
-                        <div className={styles.splitValue}>{brl(totals.variavel)}</div>
-                      </div>
                     </div>
                   </>
                 );
@@ -459,8 +456,8 @@ export default function Home() {
                 <div className={`${styles.yearInlineCard} ${styles.glass}`}>
                   <div className={styles.yearInlineTitle}>Saldo</div>
                   <div
-                    className={`${styles.yearInlineValue} ${
-                      Number(yearTotals.saldo || 0) >= 0 ? styles.saldoPos : styles.saldoNeg
+                    className={`${styles.yearInlineValue} ${styles.saldoStrong} ${
+                      Number(yearTotals.saldo || 0) >= 0 ? styles.saldoPos2 : styles.saldoNeg
                     }`}
                   >
                     {brl(yearTotals.saldo)}
@@ -485,72 +482,31 @@ export default function Home() {
       {screen === "add" && (
         <section className={`${styles.card} ${styles.fadeUp}`}>
           <div className={styles.formHeaderRow}>
-            <div className={styles.formTitle}>
-              {editingId ? "✏️ Editar lançamento" : "➕ Novo lançamento"}
-            </div>
-
+            <div className={styles.formTitle}>{editingId ? "✏️ Editar lançamento" : "➕ Novo lançamento"}</div>
             {editingId && (
-              <button
-                className={styles.ghostBtn}
-                onClick={cancelEdit}
-                disabled={loading}
-                type="button"
-              >
+              <button className={styles.ghostBtn} onClick={cancelEdit} disabled={loading} type="button">
                 Cancelar edição
               </button>
             )}
           </div>
 
-          <input
-            type="date"
-            value={form.date}
-            onChange={(e) => setForm({ ...form, date: e.target.value })}
-            disabled={loading}
-          />
+          <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} disabled={loading} />
+          <input placeholder="Descrição *" value={form.desc} required onChange={(e) => setForm({ ...form, desc: e.target.value })} disabled={loading} />
+          <input placeholder="Valor (ex: 12,50) *" value={form.value} required onChange={(e) => setForm({ ...form, value: e.target.value })} disabled={loading} />
 
-          <input
-            placeholder="Descrição *"
-            value={form.desc}
-            required
-            onChange={(e) => setForm({ ...form, desc: e.target.value })}
-            disabled={loading}
-          />
-
-          <input
-            placeholder="Valor (ex: 12,50) *"
-            value={form.value}
-            required
-            onChange={(e) => setForm({ ...form, value: e.target.value })}
-            disabled={loading}
-          />
-
-          <select
-            value={form.type}
-            required
-            onChange={(e) => setForm({ ...form, type: e.target.value })}
-            disabled={loading}
-          >
+          <select value={form.type} required onChange={(e) => setForm({ ...form, type: e.target.value })} disabled={loading}>
             <option value="">Tipo *</option>
             <option>Gasto</option>
             <option>Recebimento</option>
           </select>
 
-          <select
-            value={form.nature}
-            required
-            onChange={(e) => setForm({ ...form, nature: e.target.value })}
-            disabled={loading}
-          >
+          <select value={form.nature} required onChange={(e) => setForm({ ...form, nature: e.target.value })} disabled={loading}>
             <option value="">Natureza *</option>
             <option>Fixo</option>
             <option>Variável</option>
           </select>
 
-          <select
-            value={form.pay}
-            onChange={(e) => setForm({ ...form, pay: e.target.value })}
-            disabled={loading}
-          >
+          <select value={form.pay} onChange={(e) => setForm({ ...form, pay: e.target.value })} disabled={loading}>
             <option value="">Pagamento</option>
             <option>Débito</option>
             <option>Crédito</option>
@@ -560,9 +516,7 @@ export default function Home() {
             <button onClick={save} className={styles.primaryBtn} disabled={loading}>
               {editingId ? "Salvar alterações" : "Salvar"}
             </button>
-            <button onClick={() => setScreen("home")} disabled={loading}>
-              Cancelar
-            </button>
+            <button onClick={() => setScreen("home")} disabled={loading}>Cancelar</button>
           </div>
         </section>
       )}
@@ -571,27 +525,14 @@ export default function Home() {
       {screen === "hist" && (
         <section className={`${styles.card} ${styles.fadeUp}`}>
           <div className={styles.searchRow}>
-            <input
-              className={styles.searchInput}
-              placeholder="Buscar por descrição..."
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              disabled={loading}
-            />
-            <button
-              className={styles.clearBtn}
-              onClick={() => setQ("")}
-              disabled={loading || !q}
-              type="button"
-            >
+            <input className={styles.searchInput} placeholder="Buscar por descrição..." value={q} onChange={(e) => setQ(e.target.value)} disabled={loading} />
+            <button className={styles.clearBtn} onClick={() => setQ("")} disabled={loading || !q} type="button">
               Limpar
             </button>
           </div>
 
           {itemsFiltrados.length === 0 ? (
-            <div className={styles.empty}>
-              {q ? "Nenhum lançamento encontrado." : "Sem lançamentos neste mês."}
-            </div>
+            <div className={styles.empty}>{q ? "Nenhum lançamento encontrado." : "Sem lançamentos neste mês."}</div>
           ) : (
             itemsFiltrados.map((it) => (
               <div key={it.id} className={`${styles.item} ${styles.glass} ${itemTypeClass(it.type)}`}>
@@ -610,21 +551,10 @@ export default function Home() {
                 </div>
 
                 <div className={styles.itemActions}>
-                  <button
-                    onClick={() => startEdit(it)}
-                    className={styles.editBtn}
-                    disabled={loading}
-                    type="button"
-                  >
+                  <button onClick={() => startEdit(it)} className={styles.editBtn} disabled={loading} type="button">
                     ✏️ <span>Editar</span>
                   </button>
-
-                  <button
-                    onClick={() => del(it)}
-                    className={styles.deleteBtn}
-                    disabled={loading}
-                    type="button"
-                  >
+                  <button onClick={() => del(it)} className={styles.deleteBtn} disabled={loading} type="button">
                     🗑️ <span>Excluir</span>
                   </button>
                 </div>
