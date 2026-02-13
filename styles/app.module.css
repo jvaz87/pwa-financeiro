@@ -1,3 +1,38 @@
+/* =========================
+   THEME VARIABLES
+   ========================= */
+
+:global(html){
+  --bg: #070b16;
+  --text: #e8eeff;
+  --muted: rgba(232,238,255,.72);
+  --line: rgba(255,255,255,.12);
+  --card: rgba(17,26,46,.92);
+  --input: rgba(255,255,255,.06);
+  --btn: rgba(255,255,255,.04);
+  --btnHover: rgba(110,168,255,.18);
+  --radius: 18px;
+  --accent: #6ea8ff;
+}
+
+:global(html[data-theme="light"]){
+  --bg: #f6f7fb;
+  --text: #0b1324;
+  --muted: rgba(11,19,36,.62);
+  --line: rgba(11,19,36,.12);
+  --card: rgba(255,255,255,.92);
+  --input: rgba(11,19,36,.06);
+  --btn: rgba(11,19,36,.05);
+  --btnHover: rgba(11,19,36,.09);
+  --radius: 18px;
+  --accent: #2563eb;
+}
+
+:global(body){
+  background: var(--bg);
+  color: var(--text);
+}
+
 /* Wrapper principal */
 .app{
   min-height:100vh;
@@ -15,6 +50,18 @@
   margin-bottom:16px;
 }
 
+.topLeft{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.topRight{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
 .topbar h1{
   font-size:20px;
   font-weight:900;
@@ -24,12 +71,26 @@
 /* Mobile topo */
 @media (max-width: 520px){
   .topbar{ flex-direction:column; align-items:flex-start; }
-  .topbar select{ width:100%; }
+  .topRight{ width:100%; }
+  .topRight select{ width:100%; }
+}
+
+/* Botão do tema */
+.themeBtn{
+  width:44px;
+  height:44px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background: var(--btn);
+  cursor:pointer;
+  display:grid;
+  place-items:center;
+  font-size:18px;
 }
 
 /* Card base */
 .card{
-  background:rgba(17,26,46,.92);
+  background: var(--card);
   border:1px solid var(--line);
   border-radius:var(--radius);
   padding:14px;
@@ -40,13 +101,14 @@
 
 /* Inputs / selects */
 .card input,
-.card select{
+.card select,
+.topbar select{
   width:100%;
   padding:12px 12px;
   border-radius:14px;
-  border:1px solid rgba(255,255,255,.12);
-  background:rgba(255,255,255,.06);
-  color:inherit;
+  border:1px solid var(--line);
+  background: var(--input);
+  color: inherit;
   font-weight:800;
 }
 
@@ -56,13 +118,13 @@
   padding:14px;
   border-radius:16px;
   border:1px solid var(--line);
-  background:rgba(255,255,255,.04);
+  background: var(--btn);
   font-weight:900;
   font-size:16px;
   cursor:pointer;
 }
 
-.card button:hover{ background:rgba(110,168,255,.18); }
+.card button:hover{ background: var(--btnHover); }
 .card button:disabled{ opacity:.6; cursor:not-allowed; }
 
 /* Mensagem */
@@ -84,13 +146,13 @@
 }
 
 .primaryBtn{
-  background:linear-gradient(180deg,var(--accent),#3b79ff) !important;
-  color:#071027 !important;
+  background:linear-gradient(180deg,var(--accent),rgba(37,99,235,.95)) !important;
+  color:#fff !important;
 }
 
 .dangerBtn{
-  background:rgba(255,110,110,.2) !important;
-  color:#ff6e6e !important;
+  background:rgba(255,110,110,.18) !important;
+  color:#ff4d4d !important;
 }
 
 /* Cores valores */
@@ -112,6 +174,10 @@
   background:rgba(255,255,255,.03);
   display:grid;
   gap:8px;
+}
+
+:global(html[data-theme="light"]) .item{
+  background: rgba(11,19,36,.03);
 }
 
 .itemTop{
@@ -181,14 +247,15 @@
 
 .ghostBtn{
   background:transparent;
-  border:1px solid rgba(255,255,255,.14);
+  border:1px solid var(--line);
   border-radius:10px;
   padding:8px 10px;
   color:inherit;
   opacity:.9;
   cursor:pointer;
 }
-.ghostBtn:hover{ background:rgba(255,255,255,.05); }
+.ghostBtn:hover{ background: rgba(255,255,255,.05); }
+:global(html[data-theme="light"]) .ghostBtn:hover{ background: rgba(11,19,36,.06); }
 
 /* Dashboard */
 .dash{ display:grid; gap:14px; }
@@ -201,11 +268,11 @@
 
 .kpiCard,
 .kpiCardWide{
-  background:rgba(17,26,46,.92);
+  background: var(--card);
   border:1px solid var(--line);
   border-radius:var(--radius);
   padding:14px;
-  box-shadow:0 10px 30px rgba(0,0,0,.25);
+  box-shadow:0 10px 30px rgba(0,0,0,.18);
 }
 
 .kpiLabel{
@@ -234,8 +301,8 @@
 }
 
 /* Saldo dinâmico */
-.saldoPos { color: #63e6be; }
-.saldoNeg { color: #ff6e6e; }
+.saldoPos { color: #16a34a; }
+.saldoNeg { color: #dc2626; }
 
 .barRow{
   display:flex;
@@ -250,10 +317,13 @@
 .progress{
   height:12px;
   border-radius:999px;
-  background:rgba(255,255,255,.06);
+  background:rgba(255,255,255,.08);
   border:1px solid var(--line);
   overflow:hidden;
   margin-top:8px;
+}
+:global(html[data-theme="light"]) .progress{
+  background: rgba(11,19,36,.08);
 }
 
 .progressFill{
@@ -281,6 +351,9 @@
   border:1px solid var(--line);
   background:rgba(255,255,255,.03);
 }
+:global(html[data-theme="light"]) .splitCard{
+  background: rgba(11,19,36,.03);
+}
 
 .splitTitle{
   font-size:12px;
@@ -307,7 +380,7 @@
   padding:12px;
   border-radius:16px;
   border:1px solid var(--line);
-  background:rgba(255,255,255,.04);
+  background: var(--btn);
   font-weight:900;
   font-size:15px;
   cursor:pointer;
@@ -328,7 +401,7 @@
   border-radius:14px !important;
 }
 
-/* ===== ANUAL INLINE (3 cards) ===== */
+/* Anual inline */
 .yearInlineGrid{
   display:grid;
   grid-template-columns: repeat(3, 1fr);
@@ -345,6 +418,10 @@
   background:rgba(255,255,255,.03);
   text-align:center;
 }
+:global(html[data-theme="light"]) .yearInlineCard{
+  background: rgba(11,19,36,.03);
+}
+
 .yearInlineTitle{
   font-size:12px;
   font-weight:900;
@@ -358,25 +435,35 @@
 
 /* ===== GLASS EFFECT ===== */
 .glass{
-  background: rgba(255,255,255,.06);
-  border: 1px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.16);
   box-shadow:
-    0 12px 34px rgba(0,0,0,.35),
-    inset 0 1px 0 rgba(255,255,255,.05);
+    0 12px 34px rgba(0,0,0,.30),
+    inset 0 1px 0 rgba(255,255,255,.06);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   transition: all .25s ease;
 }
 
+:global(html[data-theme="light"]) .glass{
+  background: rgba(255,255,255,.70);
+  border: 1px solid rgba(11,19,36,.12);
+  box-shadow:
+    0 12px 34px rgba(11,19,36,.10),
+    inset 0 1px 0 rgba(255,255,255,.45);
+}
+
 .glass:hover{
   transform: translateY(-2px);
   box-shadow:
-    0 16px 40px rgba(0,0,0,.45),
-    inset 0 1px 0 rgba(255,255,255,.06);
+    0 16px 40px rgba(0,0,0,.40),
+    inset 0 1px 0 rgba(255,255,255,.08);
 }
 
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .glass{ background: rgba(17,26,46,.95); }
+/* Para o botão pequeno do tema */
+.glassBtn{
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 /* ===== ANIMAÇÃO SUAVE ===== */
