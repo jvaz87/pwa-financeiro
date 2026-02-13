@@ -25,10 +25,14 @@ export default function Home() {
 
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // busca no histórico
   const [q, setQ] = useState("");
+
+  // edição
   const [editingId, setEditingId] = useState(null);
 
-  // ✅ tema
+  // tema
   const [theme, setTheme] = useState("dark"); // "dark" | "light"
 
   const [form, setForm] = useState({
@@ -41,7 +45,7 @@ export default function Home() {
   });
 
   useEffect(() => {
-    // ✅ tema: carrega preferencia (ou sistema)
+    // ✅ Tema: carrega preferencia (ou sistema)
     try {
       const saved = localStorage.getItem("theme");
       if (saved === "dark" || saved === "light") {
@@ -52,6 +56,7 @@ export default function Home() {
           typeof window !== "undefined" &&
           window.matchMedia &&
           window.matchMedia("(prefers-color-scheme: dark)").matches;
+
         const initial = prefersDark ? "dark" : "light";
         applyTheme(initial);
         setTheme(initial);
@@ -64,14 +69,33 @@ export default function Home() {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("/sw.js").catch(() => {});
     }
+
     init();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function applyTheme(next) {
-    if (typeof document !== "undefined") {
-      document.documentElement.setAttribute("data-theme", next);
+  function setThemeColor(color) {
+    if (typeof document === "undefined") return;
+
+    let meta = document.querySelector('meta[name="theme-color"]');
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.setAttribute("name", "theme-color");
+      document.head.appendChild(meta);
     }
+    meta.setAttribute("content", color);
+  }
+
+  function applyTheme(next) {
+    if (typeof document === "undefined") return;
+
+    // aplica no html e body
+    document.documentElement.setAttribute("data-theme", next);
+    document.body.setAttribute("data-theme", next);
+
+    // ✅ Premium: combina com o topo do gradiente do tema
+    const themeColor = next === "light" ? "#eef2ff" : "#081022";
+    setThemeColor(themeColor);
   }
 
   function toggleTheme() {
@@ -147,10 +171,11 @@ export default function Home() {
     return d.toISOString().slice(0, 10);
   }
 
+  // YYYY-MM -> Fev/2026
   const formatMesAno = (ym) => {
     if (!ym) return "";
     const [year, mm] = String(ym).split("-");
-    const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+    const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
     const nome = meses[(Number(mm) || 1) - 1] || mm;
     return `${nome}/${year}`;
   };
@@ -236,6 +261,7 @@ export default function Home() {
 
   function startEdit(it) {
     setEditingId(it.id);
+
     setForm({
       date: it.date ? String(it.date).slice(0, 10) : brToISO(it.dateBR),
       value: it.value ?? "",
@@ -244,6 +270,7 @@ export default function Home() {
       nature: it.nature ?? "",
       pay: it.pay ?? "",
     });
+
     setMsg("✏️ Editando lançamento...");
     setScreen("add");
   }
@@ -273,9 +300,7 @@ export default function Home() {
     <div className={styles.app}>
       {/* TOPO */}
       <header className={styles.topbar}>
-        <div className={styles.topLeft}>
-          <h1>Controle Financeiro</h1>
-        </div>
+        <h1>Controle Financeiro • JVAZ87</h1>
 
         <div className={styles.topRight}>
           <button
@@ -284,6 +309,7 @@ export default function Home() {
             onClick={toggleTheme}
             aria-label="Alternar tema"
             title={theme === "dark" ? "Tema claro" : "Tema escuro"}
+            disabled={loading}
           >
             {theme === "dark" ? "☀️" : "🌙"}
           </button>
@@ -338,6 +364,7 @@ export default function Home() {
                 {brl(totals.saldo)}
               </div>
 
+              {/* Barra gasto/recebimento */}
               {(() => {
                 const rec = Number(totals.recebimento || 0);
                 const gas = Number(totals.gasto || 0);
@@ -377,7 +404,7 @@ export default function Home() {
               })()}
             </div>
 
-            {/* ANUAL INLINE */}
+            {/* ANUAL (limpo) */}
             <div className={`${styles.kpiCardWide} ${styles.glass}`}>
               <div className={styles.kpiLabel}>Resumo do ano • {selectedYear}</div>
 
@@ -501,7 +528,7 @@ export default function Home() {
         </section>
       )}
 
-      {/* HIST */}
+      {/* HISTÓRICO */}
       {screen === "hist" && (
         <section className={`${styles.card} ${styles.fadeUp}`}>
           <div className={styles.searchRow}>
@@ -556,4 +583,3 @@ export default function Home() {
     </div>
   );
 }
-
