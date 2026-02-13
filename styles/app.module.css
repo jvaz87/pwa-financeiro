@@ -111,6 +111,7 @@
 .primaryBtn{
   background:linear-gradient(180deg,var(--accent),rgba(37,99,235,.95)) !important;
   color:#fff !important;
+  border:none !important;
 }
 
 .dangerBtn{
@@ -216,15 +217,9 @@
 .ghostBtn:hover{ background: rgba(255,255,255,.05) !important; }
 
 /* ===== DASHBOARD ===== */
-.dash{
-  display:grid;
-  gap:14px;
-}
+.dash{ display:grid; gap:14px; }
 
-.kpiGrid{
-  display:grid;
-  gap:12px;
-}
+.kpiGrid{ display:grid; gap:12px; }
 
 @media (min-width: 640px){
   .kpiGrid{ grid-template-columns: 1fr 1fr; }
@@ -257,12 +252,6 @@
   font-size:30px;
   font-weight:1000;
   margin-top:6px;
-}
-
-.kpiHint{
-  margin-top:6px;
-  font-size:12px;
-  color:var(--muted);
 }
 
 /* Saldo dinâmico */
@@ -361,7 +350,7 @@
   border-radius:14px !important;
 }
 
-/* ===== ANUAL INLINE (3 cards) ===== */
+/* ===== ANUAL INLINE ===== */
 .yearInlineGrid{
   display:grid;
   grid-template-columns: repeat(3, 1fr);
@@ -408,7 +397,7 @@
     inset 0 1px 0 rgba(255,255,255,.08);
 }
 
-/* Para o botão pequeno do tema */
+/* Para o botão do tema */
 .glassBtn{
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
