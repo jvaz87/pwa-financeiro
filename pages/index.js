@@ -296,9 +296,12 @@ export default function Home() {
   return (
     <div className={styles.app}>
       <header className={styles.topbar}>
-        <h1>Controle Financeiro • JVAZ87</h1>
+       <h1 className={styles.appTitle}>
+       <span className={styles.titleMain}>Controle</span>
+       <span className={styles.titleAccent}>Financeiro</span>
+    </h1>
 
-        <div className={styles.topRight}>
+    <div className={styles.topRight}>
           <button
             type="button"
             className={`${styles.themeBtn} ${styles.glassBtn}`}
@@ -498,3 +501,4 @@ export default function Home() {
     </div>
   );
 }
+
