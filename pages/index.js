@@ -302,7 +302,9 @@ export default function Home() {
         <div className={styles.topRight}>
           <button
             type="button"
-            className={`${styles.themeBtn} ${styles.glassBtn}`}
+            className={`${styles.themeBtn} ${styles.glassBtn} ${
+            theme === "light" ? styles.themeLight : styles.themeDark
+           }`}
             onClick={toggleTheme}
             aria-label="Alternar tema"
             title={theme === "dark" ? "Tema claro" : "Tema escuro"}
@@ -579,3 +581,4 @@ export default function Home() {
     </div>
   );
 }
+
