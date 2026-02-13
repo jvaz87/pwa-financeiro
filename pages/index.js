@@ -3,7 +3,7 @@ import styles from "../styles/app.module.css";
 
 export default function Home() {
   const [screen, setScreen] = useState("home");
-  const [months, setMonths] = useState([]); // ["YYYY-MM", ...]
+  const [months, setMonths] = useState([]);
   const [month, setMonth] = useState("");
 
   const [items, setItems] = useState([]);
@@ -15,7 +15,6 @@ export default function Home() {
     variavel: 0,
   });
 
-  // anual (somente totals)
   const [yearTotals, setYearTotals] = useState({
     gasto: 0,
     recebimento: 0,
@@ -26,12 +25,11 @@ export default function Home() {
 
   const [msg, setMsg] = useState("");
   const [loading, setLoading] = useState(false);
-
-  // busca no histórico
   const [q, setQ] = useState("");
-
-  // edição
   const [editingId, setEditingId] = useState(null);
+
+  // ✅ tema
+  const [theme, setTheme] = useState("dark"); // "dark" | "light"
 
   const [form, setForm] = useState({
     date: todayISO(),
@@ -43,12 +41,47 @@ export default function Home() {
   });
 
   useEffect(() => {
+    // ✅ tema: carrega preferencia (ou sistema)
+    try {
+      const saved = localStorage.getItem("theme");
+      if (saved === "dark" || saved === "light") {
+        applyTheme(saved);
+        setTheme(saved);
+      } else {
+        const prefersDark =
+          typeof window !== "undefined" &&
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const initial = prefersDark ? "dark" : "light";
+        applyTheme(initial);
+        setTheme(initial);
+      }
+    } catch {
+      applyTheme("dark");
+      setTheme("dark");
+    }
+
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("/sw.js").catch(() => {});
     }
     init();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  function applyTheme(next) {
+    if (typeof document !== "undefined") {
+      document.documentElement.setAttribute("data-theme", next);
+    }
+  }
+
+  function toggleTheme() {
+    const next = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    applyTheme(next);
+    try {
+      localStorage.setItem("theme", next);
+    } catch {}
+  }
 
   async function api(action, data) {
     const r = await fetch("/api/gs", {
@@ -114,11 +147,10 @@ export default function Home() {
     return d.toISOString().slice(0, 10);
   }
 
-  // YYYY-MM -> Fev/2026
   const formatMesAno = (ym) => {
     if (!ym) return "";
     const [year, mm] = String(ym).split("-");
-    const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+    const meses = ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
     const nome = meses[(Number(mm) || 1) - 1] || mm;
     return `${nome}/${year}`;
   };
@@ -204,7 +236,6 @@ export default function Home() {
 
   function startEdit(it) {
     setEditingId(it.id);
-
     setForm({
       date: it.date ? String(it.date).slice(0, 10) : brToISO(it.dateBR),
       value: it.value ?? "",
@@ -213,7 +244,6 @@ export default function Home() {
       nature: it.nature ?? "",
       pay: it.pay ?? "",
     });
-
     setMsg("✏️ Editando lançamento...");
     setScreen("add");
   }
@@ -243,15 +273,29 @@ export default function Home() {
     <div className={styles.app}>
       {/* TOPO */}
       <header className={styles.topbar}>
-        <h1>Controle Financeiro • JVAZ87</h1>
+        <div className={styles.topLeft}>
+          <h1>Controle Financeiro • JVAZ87</h1>
+        </div>
 
-        <select value={month} onChange={(e) => setMonth(e.target.value)} disabled={loading}>
-          {monthsOptions.map((m) => (
-            <option key={m.value} value={m.value}>
-              {m.label}
-            </option>
-          ))}
-        </select>
+        <div className={styles.topRight}>
+          <button
+            type="button"
+            className={`${styles.themeBtn} ${styles.glassBtn}`}
+            onClick={toggleTheme}
+            aria-label="Alternar tema"
+            title={theme === "dark" ? "Tema claro" : "Tema escuro"}
+          >
+            {theme === "dark" ? "☀️" : "🌙"}
+          </button>
+
+          <select value={month} onChange={(e) => setMonth(e.target.value)} disabled={loading}>
+            {monthsOptions.map((m) => (
+              <option key={m.value} value={m.value}>
+                {m.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </header>
 
       {/* HOME */}
@@ -294,7 +338,6 @@ export default function Home() {
                 {brl(totals.saldo)}
               </div>
 
-              {/* ✅ BARRA gasto x recebimento (voltou) */}
               {(() => {
                 const rec = Number(totals.recebimento || 0);
                 const gas = Number(totals.gasto || 0);
@@ -334,7 +377,7 @@ export default function Home() {
               })()}
             </div>
 
-            {/* ✅ ANUAL LIMPO: 3 cards inline */}
+            {/* ANUAL INLINE */}
             <div className={`${styles.kpiCardWide} ${styles.glass}`}>
               <div className={styles.kpiLabel}>Resumo do ano • {selectedYear}</div>
 
@@ -378,7 +421,7 @@ export default function Home() {
         </section>
       )}
 
-      {/* ✅ LANÇAR (voltou completo) */}
+      {/* LANÇAR */}
       {screen === "add" && (
         <section className={`${styles.card} ${styles.fadeUp}`}>
           <div className={styles.formHeaderRow}>
