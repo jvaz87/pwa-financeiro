@@ -274,7 +274,7 @@ export default function Home() {
       {/* TOPO */}
       <header className={styles.topbar}>
         <div className={styles.topLeft}>
-          <h1>Controle Financeiro • JVAZ87</h1>
+          <h1>Controle Financeiro</h1>
         </div>
 
         <div className={styles.topRight}>
@@ -556,3 +556,4 @@ export default function Home() {
     </div>
   );
 }
+
