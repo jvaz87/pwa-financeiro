@@ -1,3 +1,22 @@
+/* =========================
+   TRANSIÇÃO SUAVE DO TEMA
+   (apenas CSS)
+   ========================= */
+
+/* animação do fundo/cores do site todo */
+:global(html),
+:global(body){
+  transition: background 260ms ease, color 260ms ease;
+}
+
+/* se preferir respeitar usuários com redução de movimento */
+@media (prefers-reduced-motion: reduce){
+  :global(html),
+  :global(body){
+    transition: none !important;
+  }
+}
+
 /* Wrapper principal */
 .app{
   min-height:100vh;
@@ -5,6 +24,9 @@
   max-width:860px;
   margin:0 auto;
   color: var(--text);
+
+  /* ajuda a suavizar percepção na troca */
+  transition: color 260ms ease;
 }
 
 /* Topo */
@@ -46,8 +68,11 @@
   display:grid;
   place-items:center;
   font-size:18px;
+
+  transition: background 220ms ease, border-color 220ms ease, transform 220ms ease, filter 220ms ease;
 }
-.themeBtn:disabled{ opacity:.6; cursor:not-allowed; }
+.themeBtn:hover{ transform: translateY(-1px); }
+.themeBtn:disabled{ opacity:.6; cursor:not-allowed; transform:none; }
 
 /* Card base */
 .card{
@@ -58,6 +83,12 @@
   box-shadow:0 10px 30px rgba(0,0,0,.18);
   display:grid;
   gap:12px;
+
+  transition:
+    background 260ms ease,
+    border-color 260ms ease,
+    box-shadow 260ms ease,
+    transform 220ms ease;
 }
 
 /* Inputs / selects */
@@ -72,6 +103,14 @@
   color: var(--text);
   font-weight:800;
   outline:none;
+
+  transition: background 260ms ease, border-color 260ms ease, color 260ms ease, box-shadow 220ms ease;
+}
+
+.card input:focus,
+.card select:focus,
+.topbar select:focus{
+  box-shadow: 0 0 0 3px rgba(110,168,255,.20);
 }
 
 /* Botões */
@@ -85,10 +124,19 @@
   font-size:16px;
   cursor:pointer;
   color: var(--text);
+
+  transition: background 220ms ease, border-color 220ms ease, transform 220ms ease, filter 220ms ease;
 }
 
-.card button:hover{ background: var(--btnHover); }
-.card button:disabled{ opacity:.6; cursor:not-allowed; }
+.card button:hover{
+  background: var(--btnHover);
+  transform: translateY(-1px);
+}
+.card button:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+  transform:none;
+}
 
 /* Mensagem */
 .msg{
@@ -96,6 +144,7 @@
   font-weight:900;
   text-align:center;
   color:var(--muted);
+  transition: color 260ms ease;
 }
 
 /* Utilitários */
@@ -129,6 +178,7 @@
   font-weight:900;
   text-align:center;
   padding:10px 0;
+  transition: color 260ms ease;
 }
 
 .item{
@@ -138,6 +188,12 @@
   background:rgba(255,255,255,.03);
   display:grid;
   gap:8px;
+
+  transition: background 260ms ease, border-color 260ms ease, transform 220ms ease, box-shadow 260ms ease;
+}
+
+.item:hover{
+  transform: translateY(-1px);
 }
 
 .itemTop{
@@ -160,6 +216,8 @@
   padding:4px 10px;
   border-radius:999px;
   background:rgba(255,255,255,.02);
+
+  transition: background 260ms ease, border-color 260ms ease, color 260ms ease;
 }
 
 .itemMeta{
@@ -169,6 +227,8 @@
   color:var(--muted);
   font-weight:900;
   font-size:13px;
+
+  transition: color 260ms ease;
 }
 
 .itemActions{
@@ -189,8 +249,13 @@
   border-radius:10px;
   font-weight:900;
   cursor:pointer;
+
+  transition: transform 220ms ease, filter 220ms ease;
 }
-.editBtn:hover{ filter:brightness(1.05); }
+.editBtn:hover{
+  filter:brightness(1.05);
+  transform: translateY(-1px);
+}
 
 /* ===== FORM ===== */
 .formHeaderRow{
@@ -213,8 +278,13 @@
   color:var(--text) !important;
   opacity:.9;
   cursor:pointer;
+
+  transition: background 220ms ease, border-color 220ms ease, transform 220ms ease;
 }
-.ghostBtn:hover{ background: rgba(255,255,255,.05) !important; }
+.ghostBtn:hover{
+  background: rgba(255,255,255,.05) !important;
+  transform: translateY(-1px);
+}
 
 /* ===== DASHBOARD ===== */
 .dash{ display:grid; gap:14px; }
@@ -233,6 +303,8 @@
   border-radius:var(--radius);
   padding:14px;
   box-shadow:0 10px 30px rgba(0,0,0,.18);
+
+  transition: background 260ms ease, border-color 260ms ease, box-shadow 260ms ease, transform 220ms ease;
 }
 
 .kpiLabel{
@@ -240,6 +312,7 @@
   color:var(--muted);
   font-size:13px;
   letter-spacing:.2px;
+  transition: color 260ms ease;
 }
 
 .kpiValue{
@@ -266,6 +339,7 @@
   font-size:12px;
   color:var(--muted);
   font-weight:900;
+  transition: color 260ms ease;
 }
 
 .progress{
@@ -275,11 +349,14 @@
   border:1px solid var(--line);
   overflow:hidden;
   margin-top:8px;
+
+  transition: background 260ms ease, border-color 260ms ease;
 }
 
 .progressFill{
   height:100%;
   border-radius:999px;
+  transition: width 240ms ease;
 }
 
 .barYellow { background: linear-gradient(90deg, #ffd166, #ffb703); }
@@ -301,12 +378,15 @@
   border-radius:14px;
   border:1px solid var(--line);
   background:rgba(255,255,255,.03);
+
+  transition: background 260ms ease, border-color 260ms ease;
 }
 
 .splitTitle{
   font-size:12px;
   color:var(--muted);
   font-weight:900;
+  transition: color 260ms ease;
 }
 
 .splitValue{
@@ -333,6 +413,8 @@
   font-weight:900;
   font-size:15px;
   cursor:pointer;
+
+  transition: background 220ms ease, transform 220ms ease, border-color 220ms ease;
 }
 
 /* ===== BUSCA ===== */
@@ -366,11 +448,14 @@
   border:1px solid var(--line);
   background:rgba(255,255,255,.03);
   text-align:center;
+
+  transition: background 260ms ease, border-color 260ms ease;
 }
 .yearInlineTitle{
   font-size:12px;
   font-weight:900;
   color:var(--muted);
+  transition: color 260ms ease;
 }
 .yearInlineValue{
   margin-top:6px;
@@ -378,7 +463,9 @@
   font-weight:1000;
 }
 
-/* ===== GLASS EFFECT ===== */
+/* =========================
+   GLASS EFFECT (DARK)
+   ========================= */
 .glass{
   background: rgba(255,255,255,.08);
   border: 1px solid rgba(255,255,255,.16);
@@ -390,11 +477,33 @@
   transition: all .25s ease;
 }
 
+/* Hover do glass */
 .glass:hover{
   transform: translateY(-2px);
   box-shadow:
     0 16px 40px rgba(0,0,0,.40),
     inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+/* =========================
+   GLASS EFFECT (LIGHT)
+   - mais "white-glass"
+   ========================= */
+:global(html[data-theme="light"]) .glass,
+:global(body[data-theme="light"]) .glass{
+  background: rgba(255,255,255,.72);
+  border: 1px solid rgba(11,19,36,.12);
+  box-shadow:
+    0 10px 26px rgba(11,19,36,.10),
+    inset 0 1px 0 rgba(255,255,255,.55);
+}
+
+/* Hover light */
+:global(html[data-theme="light"]) .glass:hover,
+:global(body[data-theme="light"]) .glass:hover{
+  box-shadow:
+    0 14px 34px rgba(11,19,36,.14),
+    inset 0 1px 0 rgba(255,255,255,.60);
 }
 
 /* Para o botão do tema */
