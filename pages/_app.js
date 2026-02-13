@@ -58,11 +58,15 @@ export default function App({ Component, pageProps }) {
           min-height:100%;
           background: linear-gradient(180deg, var(--bg1), var(--bg2));
           color: var(--text);
+
+          /* ✅ transição suave do tema (global) */
+          transition: background 260ms ease, color 260ms ease;
         }
 
-          /* ✅ transição suave do tema */
-          transition: background 260ms ease, color 260ms ease;
-  
+        @media (prefers-reduced-motion: reduce){
+          html, body{ transition:none !important; }
+        }
+
         button{
           background:none;
           border:none;
@@ -77,20 +81,15 @@ export default function App({ Component, pageProps }) {
           color: var(--text);
           font-size:15px;
           outline:none;
+          transition: background 260ms ease, border-color 260ms ease, color 260ms ease, box-shadow 220ms ease;
         }
 
         select{
           appearance:none;
         }
-
-        @media (prefers-reduced-motion: reduce){
-        html, body{ transition:none !important; }
-        }
-
       `}</style>
 
       <Component {...pageProps} />
     </>
   );
 }
-
