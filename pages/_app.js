@@ -60,6 +60,9 @@ export default function App({ Component, pageProps }) {
           color: var(--text);
         }
 
+          /* ✅ transição suave do tema */
+          transition: background 260ms ease, color 260ms ease;
+  
         button{
           background:none;
           border:none;
@@ -79,9 +82,15 @@ export default function App({ Component, pageProps }) {
         select{
           appearance:none;
         }
+
+        @media (prefers-reduced-motion: reduce){
+        html, body{ transition:none !important; }
+        }
+
       `}</style>
 
       <Component {...pageProps} />
     </>
   );
 }
+
