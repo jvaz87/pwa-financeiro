@@ -1,44 +1,10 @@
-/* =========================
-   THEME VARIABLES
-   ========================= */
-
-:global(html){
-  --bg: #070b16;
-  --text: #e8eeff;
-  --muted: rgba(232,238,255,.72);
-  --line: rgba(255,255,255,.12);
-  --card: rgba(17,26,46,.92);
-  --input: rgba(255,255,255,.06);
-  --btn: rgba(255,255,255,.04);
-  --btnHover: rgba(110,168,255,.18);
-  --radius: 18px;
-  --accent: #6ea8ff;
-}
-
-:global(html[data-theme="light"]){
-  --bg: #f6f7fb;
-  --text: #0b1324;
-  --muted: rgba(11,19,36,.62);
-  --line: rgba(11,19,36,.12);
-  --card: rgba(255,255,255,.92);
-  --input: rgba(11,19,36,.06);
-  --btn: rgba(11,19,36,.05);
-  --btnHover: rgba(11,19,36,.09);
-  --radius: 18px;
-  --accent: #2563eb;
-}
-
-:global(body){
-  background: var(--bg);
-  color: var(--text);
-}
-
 /* Wrapper principal */
 .app{
   min-height:100vh;
   padding:16px 14px 90px;
   max-width:860px;
   margin:0 auto;
+  color: var(--text);
 }
 
 /* Topo */
@@ -50,22 +16,16 @@
   margin-bottom:16px;
 }
 
-.topLeft{
-  display:flex;
-  align-items:center;
-  gap:10px;
+.topbar h1{
+  font-size:20px;
+  font-weight:900;
+  margin:0;
 }
 
 .topRight{
   display:flex;
   align-items:center;
   gap:10px;
-}
-
-.topbar h1{
-  font-size:20px;
-  font-weight:900;
-  margin:0;
 }
 
 /* Mobile topo */
@@ -75,18 +35,19 @@
   .topRight select{ width:100%; }
 }
 
-/* Botão do tema */
+/* Botão tema */
 .themeBtn{
   width:44px;
   height:44px;
   border-radius:14px;
   border:1px solid var(--line);
-  background: var(--btn);
+  background: var(--btnBg);
   cursor:pointer;
   display:grid;
   place-items:center;
   font-size:18px;
 }
+.themeBtn:disabled{ opacity:.6; cursor:not-allowed; }
 
 /* Card base */
 .card{
@@ -94,7 +55,7 @@
   border:1px solid var(--line);
   border-radius:var(--radius);
   padding:14px;
-  box-shadow:0 10px 30px rgba(0,0,0,.25);
+  box-shadow:0 10px 30px rgba(0,0,0,.18);
   display:grid;
   gap:12px;
 }
@@ -107,9 +68,10 @@
   padding:12px 12px;
   border-radius:14px;
   border:1px solid var(--line);
-  background: var(--input);
-  color: inherit;
+  background: var(--inputBg);
+  color: var(--text);
   font-weight:800;
+  outline:none;
 }
 
 /* Botões */
@@ -118,10 +80,11 @@
   padding:14px;
   border-radius:16px;
   border:1px solid var(--line);
-  background: var(--btn);
+  background: var(--btnBg);
   font-weight:900;
   font-size:16px;
   cursor:pointer;
+  color: var(--text);
 }
 
 .card button:hover{ background: var(--btnHover); }
@@ -159,7 +122,7 @@
 .valorRecebimento{ color:#16a34a; font-weight:900; }
 .valorGasto{ color:#dc2626; font-weight:900; }
 
-/* Histórico */
+/* ===== HISTÓRICO ===== */
 .empty{
   color:var(--muted);
   font-weight:900;
@@ -174,10 +137,6 @@
   background:rgba(255,255,255,.03);
   display:grid;
   gap:8px;
-}
-
-:global(html[data-theme="light"]) .item{
-  background: rgba(11,19,36,.03);
 }
 
 .itemTop{
@@ -223,8 +182,8 @@
 .editBtn{
   flex:1;
   background:rgba(37,99,235,.95);
-  color:#fff;
-  border:none;
+  color:#fff !important;
+  border:none !important;
   padding:10px 12px;
   border-radius:10px;
   font-weight:900;
@@ -232,7 +191,7 @@
 }
 .editBtn:hover{ filter:brightness(1.05); }
 
-/* Form header */
+/* ===== FORM ===== */
 .formHeaderRow{
   display:flex;
   align-items:center;
@@ -246,21 +205,27 @@
 .formTitle{ font-weight:900; }
 
 .ghostBtn{
-  background:transparent;
-  border:1px solid var(--line);
-  border-radius:10px;
-  padding:8px 10px;
-  color:inherit;
+  background:transparent !important;
+  border:1px solid var(--line) !important;
+  border-radius:10px !important;
+  padding:8px 10px !important;
+  color:var(--text) !important;
   opacity:.9;
   cursor:pointer;
 }
-.ghostBtn:hover{ background: rgba(255,255,255,.05); }
-:global(html[data-theme="light"]) .ghostBtn:hover{ background: rgba(11,19,36,.06); }
+.ghostBtn:hover{ background: rgba(255,255,255,.05) !important; }
 
-/* Dashboard */
-.dash{ display:grid; gap:14px; }
+/* ===== DASHBOARD ===== */
+.dash{
+  display:grid;
+  gap:14px;
+}
 
-.kpiGrid{ display:grid; gap:12px; }
+.kpiGrid{
+  display:grid;
+  gap:12px;
+}
+
 @media (min-width: 640px){
   .kpiGrid{ grid-template-columns: 1fr 1fr; }
   .kpiCardWide{ grid-column: 1 / -1; }
@@ -322,9 +287,6 @@
   overflow:hidden;
   margin-top:8px;
 }
-:global(html[data-theme="light"]) .progress{
-  background: rgba(11,19,36,.08);
-}
 
 .progressFill{
   height:100%;
@@ -351,9 +313,6 @@
   border:1px solid var(--line);
   background:rgba(255,255,255,.03);
 }
-:global(html[data-theme="light"]) .splitCard{
-  background: rgba(11,19,36,.03);
-}
 
 .splitTitle{
   font-size:12px;
@@ -375,18 +334,19 @@
 @media (max-width: 520px){
   .dashActions{ grid-template-columns:1fr; }
 }
+
 .dashActions button{
   width:100%;
   padding:12px;
   border-radius:16px;
   border:1px solid var(--line);
-  background: var(--btn);
+  background: var(--btnBg);
   font-weight:900;
   font-size:15px;
   cursor:pointer;
 }
 
-/* Busca */
+/* ===== BUSCA ===== */
 .searchRow{
   display:flex;
   gap:10px;
@@ -401,7 +361,7 @@
   border-radius:14px !important;
 }
 
-/* Anual inline */
+/* ===== ANUAL INLINE (3 cards) ===== */
 .yearInlineGrid{
   display:grid;
   grid-template-columns: repeat(3, 1fr);
@@ -418,10 +378,6 @@
   background:rgba(255,255,255,.03);
   text-align:center;
 }
-:global(html[data-theme="light"]) .yearInlineCard{
-  background: rgba(11,19,36,.03);
-}
-
 .yearInlineTitle{
   font-size:12px;
   font-weight:900;
@@ -443,14 +399,6 @@
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   transition: all .25s ease;
-}
-
-:global(html[data-theme="light"]) .glass{
-  background: rgba(255,255,255,.70);
-  border: 1px solid rgba(11,19,36,.12);
-  box-shadow:
-    0 12px 34px rgba(11,19,36,.10),
-    inset 0 1px 0 rgba(255,255,255,.45);
 }
 
 .glass:hover{
