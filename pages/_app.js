@@ -59,7 +59,7 @@ export default function App({ Component, pageProps }) {
           background: linear-gradient(180deg, var(--bg1), var(--bg2));
           color: var(--text);
 
-          /* ✅ transição suave do tema (global) */
+          /* ✅ transição suave do tema */
           transition: background 260ms ease, color 260ms ease;
         }
 
