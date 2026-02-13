@@ -45,7 +45,7 @@ export default function Home() {
   });
 
   useEffect(() => {
-    // ✅ Tema: carrega preferencia (ou sistema) e já seta theme-color
+    // Tema: carrega preferencia (ou sistema) e já seta theme-color
     try {
       const saved = localStorage.getItem("theme");
       if (saved === "dark" || saved === "light") {
@@ -73,38 +73,6 @@ export default function Home() {
     init();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  function setThemeColor(color) {
-    if (typeof document === "undefined") return;
-
-    let meta = document.querySelector('meta[name="theme-color"]');
-    if (!meta) {
-      meta = document.createElement("meta");
-      meta.setAttribute("name", "theme-color");
-      document.head.appendChild(meta);
-    }
-    meta.setAttribute("content", color);
-  }
-
-  function applyTheme(next) {
-    if (typeof document === "undefined") return;
-
-    document.documentElement.setAttribute("data-theme", next);
-    document.body.setAttribute("data-theme", next);
-
-    // ✅ Premium: combina com o topo do gradiente do tema
-    const themeColor = next === "light" ? "#eef2ff" : "#081022";
-    setThemeColor(themeColor);
-  }
-
-  function toggleTheme() {
-    const next = theme === "dark" ? "light" : "dark";
-    setTheme(next);
-    applyTheme(next);
-    try {
-      localStorage.setItem("theme", next);
-    } catch {}
-  }
 
   async function api(action, data) {
     const r = await fetch("/api/gs", {
@@ -156,6 +124,38 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function setThemeColor(color) {
+    if (typeof document === "undefined") return;
+
+    let meta = document.querySelector('meta[name="theme-color"]');
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.setAttribute("name", "theme-color");
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute("content", color);
+  }
+
+  function applyTheme(next) {
+    if (typeof document === "undefined") return;
+
+    document.documentElement.setAttribute("data-theme", next);
+    document.body.setAttribute("data-theme", next);
+
+    // barra do celular
+    const themeColor = next === "light" ? "#eef2ff" : "#081022";
+    setThemeColor(themeColor);
+  }
+
+  function toggleTheme() {
+    const next = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    applyTheme(next);
+    try {
+      localStorage.setItem("theme", next);
+    } catch {}
   }
 
   function brl(v) {
@@ -295,16 +295,13 @@ export default function Home() {
 
   return (
     <div className={styles.app}>
-      {/* TOPO */}
       <header className={styles.topbar}>
         <h1>Controle Financeiro • JVAZ87</h1>
 
         <div className={styles.topRight}>
           <button
             type="button"
-            className={`${styles.themeBtn} ${styles.glassBtn} ${
-              theme === "light" ? styles.themeLight : styles.themeDark
-            }`}
+            className={`${styles.themeBtn} ${styles.glassBtn}`}
             onClick={toggleTheme}
             aria-label="Alternar tema"
             title={theme === "dark" ? "Tema claro" : "Tema escuro"}
@@ -323,7 +320,6 @@ export default function Home() {
         </div>
       </header>
 
-      {/* HOME */}
       {screen === "home" && (
         <section className={styles.card}>
           <button onClick={() => setScreen("dash")} disabled={loading}>📊 Dashboard</button>
@@ -332,7 +328,6 @@ export default function Home() {
         </section>
       )}
 
-      {/* DASHBOARD */}
       {screen === "dash" && (
         <section key={month} className={`${styles.dash} ${styles.fadeUp}`}>
           <div className={styles.kpiGrid}>
@@ -392,7 +387,6 @@ export default function Home() {
               })()}
             </div>
 
-            {/* ANUAL INLINE */}
             <div className={`${styles.kpiCardWide} ${styles.glass}`}>
               <div className={styles.kpiLabel}>Resumo do ano • {selectedYear}</div>
 
@@ -424,7 +418,6 @@ export default function Home() {
         </section>
       )}
 
-      {/* LANÇAR */}
       {screen === "add" && (
         <section className={`${styles.card} ${styles.fadeUp}`}>
           <div className={styles.formHeaderRow}>
@@ -437,9 +430,7 @@ export default function Home() {
           </div>
 
           <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} disabled={loading} />
-
           <input placeholder="Descrição *" value={form.desc} required onChange={(e) => setForm({ ...form, desc: e.target.value })} disabled={loading} />
-
           <input placeholder="Valor (ex: 12,50) *" value={form.value} required onChange={(e) => setForm({ ...form, value: e.target.value })} disabled={loading} />
 
           <select value={form.type} required onChange={(e) => setForm({ ...form, type: e.target.value })} disabled={loading}>
@@ -469,7 +460,6 @@ export default function Home() {
         </section>
       )}
 
-      {/* HISTÓRICO */}
       {screen === "hist" && (
         <section className={`${styles.card} ${styles.fadeUp}`}>
           <div className={styles.searchRow}>
