@@ -303,8 +303,8 @@ export default function Home() {
           <button
             type="button"
             className={`${styles.themeBtn} ${styles.glassBtn} ${
-            theme === "light" ? styles.themeLight : styles.themeDark
-           }`}
+              theme === "light" ? styles.themeLight : styles.themeDark
+            }`}
             onClick={toggleTheme}
             aria-label="Alternar tema"
             title={theme === "dark" ? "Tema claro" : "Tema escuro"}
@@ -338,28 +338,20 @@ export default function Home() {
           <div className={styles.kpiGrid}>
             <div className={`${styles.kpiCard} ${styles.glass}`}>
               <div className={styles.kpiLabel}>Recebimentos</div>
-              <div className={`${styles.kpiValue} ${styles.valorRecebimento}`}>
-                {brl(totals.recebimento)}
-              </div>
+              <div className={`${styles.kpiValue} ${styles.valorRecebimento}`}>{brl(totals.recebimento)}</div>
               <div className={styles.kpiHint}>Total no mês</div>
             </div>
 
             <div className={`${styles.kpiCard} ${styles.glass}`}>
               <div className={styles.kpiLabel}>Gastos</div>
-              <div className={`${styles.kpiValue} ${styles.valorGasto}`}>
-                {brl(totals.gasto)}
-              </div>
+              <div className={`${styles.kpiValue} ${styles.valorGasto}`}>{brl(totals.gasto)}</div>
               <div className={styles.kpiHint}>Total no mês</div>
             </div>
 
             <div className={`${styles.kpiCardWide} ${styles.glass}`}>
               <div className={styles.kpiLabel}>Saldo</div>
 
-              <div
-                className={`${styles.kpiValueStrong} ${
-                  Number(totals.saldo || 0) >= 0 ? styles.saldoPos : styles.saldoNeg
-                }`}
-              >
+              <div className={`${styles.kpiValueStrong} ${Number(totals.saldo||0) >= 0 ? styles.saldoPos : styles.saldoNeg}`}>
                 {brl(totals.saldo)}
               </div>
 
@@ -379,9 +371,7 @@ export default function Home() {
 
                     <div className={styles.progress}>
                       <div
-                        className={`${styles.progressFill} ${
-                          perc >= 80 ? styles.barRed : perc >= 50 ? styles.barYellow : styles.barGreen
-                        }`}
+                        className={`${styles.progressFill} ${perc >= 80 ? styles.barRed : perc >= 50 ? styles.barYellow : styles.barGreen}`}
                         style={{ width: `${Math.min(100, Math.round(perc))}%` }}
                       />
                     </div>
@@ -409,25 +399,17 @@ export default function Home() {
               <div className={styles.yearInlineGrid}>
                 <div className={`${styles.yearInlineCard} ${styles.glass}`}>
                   <div className={styles.yearInlineTitle}>Recebimentos</div>
-                  <div className={`${styles.yearInlineValue} ${styles.valorRecebimento}`}>
-                    {brl(yearTotals.recebimento)}
-                  </div>
+                  <div className={`${styles.yearInlineValue} ${styles.valorRecebimento}`}>{brl(yearTotals.recebimento)}</div>
                 </div>
 
                 <div className={`${styles.yearInlineCard} ${styles.glass}`}>
                   <div className={styles.yearInlineTitle}>Gastos</div>
-                  <div className={`${styles.yearInlineValue} ${styles.valorGasto}`}>
-                    {brl(yearTotals.gasto)}
-                  </div>
+                  <div className={`${styles.yearInlineValue} ${styles.valorGasto}`}>{brl(yearTotals.gasto)}</div>
                 </div>
 
                 <div className={`${styles.yearInlineCard} ${styles.glass}`}>
                   <div className={styles.yearInlineTitle}>Saldo</div>
-                  <div
-                    className={`${styles.yearInlineValue} ${
-                      Number(yearTotals.saldo || 0) >= 0 ? styles.saldoPos : styles.saldoNeg
-                    }`}
-                  >
+                  <div className={`${styles.yearInlineValue} ${Number(yearTotals.saldo||0) >= 0 ? styles.saldoPos : styles.saldoNeg}`}>
                     {brl(yearTotals.saldo)}
                   </div>
                 </div>
@@ -436,12 +418,8 @@ export default function Home() {
           </div>
 
           <div className={styles.dashActions}>
-            <button onClick={refreshAll} disabled={loading}>
-              {loading ? "Carregando..." : "Atualizar"}
-            </button>
-            <button onClick={() => setScreen("home")} disabled={loading}>
-              Voltar
-            </button>
+            <button onClick={refreshAll} disabled={loading}>{loading ? "Carregando..." : "Atualizar"}</button>
+            <button onClick={() => setScreen("home")} disabled={loading}>Voltar</button>
           </div>
         </section>
       )}
@@ -450,9 +428,7 @@ export default function Home() {
       {screen === "add" && (
         <section className={`${styles.card} ${styles.fadeUp}`}>
           <div className={styles.formHeaderRow}>
-            <div className={styles.formTitle}>
-              {editingId ? "✏️ Editar lançamento" : "➕ Novo lançamento"}
-            </div>
+            <div className={styles.formTitle}>{editingId ? "✏️ Editar lançamento" : "➕ Novo lançamento"}</div>
             {editingId && (
               <button className={styles.ghostBtn} onClick={cancelEdit} disabled={loading}>
                 Cancelar edição
@@ -460,56 +436,25 @@ export default function Home() {
             )}
           </div>
 
-          <input
-            type="date"
-            value={form.date}
-            onChange={(e) => setForm({ ...form, date: e.target.value })}
-            disabled={loading}
-          />
+          <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} disabled={loading} />
 
-          <input
-            placeholder="Descrição *"
-            value={form.desc}
-            required
-            onChange={(e) => setForm({ ...form, desc: e.target.value })}
-            disabled={loading}
-          />
+          <input placeholder="Descrição *" value={form.desc} required onChange={(e) => setForm({ ...form, desc: e.target.value })} disabled={loading} />
 
-          <input
-            placeholder="Valor (ex: 12,50) *"
-            value={form.value}
-            required
-            onChange={(e) => setForm({ ...form, value: e.target.value })}
-            disabled={loading}
-          />
+          <input placeholder="Valor (ex: 12,50) *" value={form.value} required onChange={(e) => setForm({ ...form, value: e.target.value })} disabled={loading} />
 
-          <select
-            value={form.type}
-            required
-            onChange={(e) => setForm({ ...form, type: e.target.value })}
-            disabled={loading}
-          >
+          <select value={form.type} required onChange={(e) => setForm({ ...form, type: e.target.value })} disabled={loading}>
             <option value="">Tipo *</option>
             <option>Gasto</option>
             <option>Recebimento</option>
           </select>
 
-          <select
-            value={form.nature}
-            required
-            onChange={(e) => setForm({ ...form, nature: e.target.value })}
-            disabled={loading}
-          >
+          <select value={form.nature} required onChange={(e) => setForm({ ...form, nature: e.target.value })} disabled={loading}>
             <option value="">Natureza *</option>
             <option>Fixo</option>
             <option>Variável</option>
           </select>
 
-          <select
-            value={form.pay}
-            onChange={(e) => setForm({ ...form, pay: e.target.value })}
-            disabled={loading}
-          >
+          <select value={form.pay} onChange={(e) => setForm({ ...form, pay: e.target.value })} disabled={loading}>
             <option value="">Pagamento</option>
             <option>Débito</option>
             <option>Crédito</option>
@@ -519,9 +464,7 @@ export default function Home() {
             <button onClick={save} className={styles.primaryBtn} disabled={loading}>
               {editingId ? "Salvar alterações" : "Salvar"}
             </button>
-            <button onClick={() => setScreen("home")} disabled={loading}>
-              Cancelar
-            </button>
+            <button onClick={() => setScreen("home")} disabled={loading}>Cancelar</button>
           </div>
         </section>
       )}
@@ -530,22 +473,12 @@ export default function Home() {
       {screen === "hist" && (
         <section className={`${styles.card} ${styles.fadeUp}`}>
           <div className={styles.searchRow}>
-            <input
-              className={styles.searchInput}
-              placeholder="Buscar por descrição..."
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              disabled={loading}
-            />
-            <button className={styles.clearBtn} onClick={() => setQ("")} disabled={loading || !q}>
-              Limpar
-            </button>
+            <input className={styles.searchInput} placeholder="Buscar por descrição..." value={q} onChange={(e) => setQ(e.target.value)} disabled={loading} />
+            <button className={styles.clearBtn} onClick={() => setQ("")} disabled={loading || !q}>Limpar</button>
           </div>
 
           {itemsFiltrados.length === 0 ? (
-            <div className={styles.empty}>
-              {q ? "Nenhum lançamento encontrado." : "Sem lançamentos neste mês."}
-            </div>
+            <div className={styles.empty}>{q ? "Nenhum lançamento encontrado." : "Sem lançamentos neste mês."}</div>
           ) : (
             itemsFiltrados.map((it) => (
               <div key={it.id} className={styles.item}>
@@ -556,24 +489,18 @@ export default function Home() {
 
                 <div className={styles.itemMeta}>
                   <span>{it.dateBR}</span>
-                  <span className={valueClassByType(it.type)}>{it.value ? brl(it.value) : brl(0)}</span>
+                  <span className={valueClassByType(it.type)}>{brl(it.value)}</span>
                 </div>
 
                 <div className={styles.itemActions}>
-                  <button onClick={() => startEdit(it)} className={styles.editBtn} disabled={loading}>
-                    Editar
-                  </button>
-                  <button onClick={() => del(it)} className={styles.dangerBtn} disabled={loading}>
-                    Excluir
-                  </button>
+                  <button onClick={() => startEdit(it)} className={styles.editBtn} disabled={loading}>Editar</button>
+                  <button onClick={() => del(it)} className={styles.dangerBtn} disabled={loading}>Excluir</button>
                 </div>
               </div>
             ))
           )}
 
-          <button onClick={() => setScreen("home")} disabled={loading}>
-            Voltar
-          </button>
+          <button onClick={() => setScreen("home")} disabled={loading}>Voltar</button>
         </section>
       )}
 
@@ -581,4 +508,3 @@ export default function Home() {
     </div>
   );
 }
-
