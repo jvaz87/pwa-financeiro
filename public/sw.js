@@ -1,4 +1,4 @@
-const CACHE = "pwa-financeiro-v1";
+const CACHE = "pwa-financeiro";
 const ASSETS = ["/", "/manifest.json"];
 
 self.addEventListener("install", (e) => {
@@ -14,3 +14,4 @@ self.addEventListener("fetch", (e) => {
     caches.match(e.request).then((cached) => cached || fetch(e.request))
   );
 });
+
