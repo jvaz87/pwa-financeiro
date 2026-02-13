@@ -522,6 +522,57 @@
 }
 
 /* =========================
+   THEME BUTTON ANIMATION
+   ========================= */
+
+.themeBtn{
+  transition:
+    background 220ms ease,
+    border-color 220ms ease,
+    transform 400ms cubic-bezier(.22,1,.36,1),
+    box-shadow 220ms ease;
+  will-change: transform;
+}
+
+/* rotação baseada no estado */
+.themeDark{
+  transform: rotate(0deg) scale(1);
+}
+
+.themeLight{
+  transform: rotate(180deg) scale(1.05);
+}
+
+/* micro pop ao clicar */
+.themeBtn:active{
+  transform: scale(.92);
+}
+
+/* efeito brilho sutil ao alternar */
+.themeBtn::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:14px;
+  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,.25), transparent 70%);
+  opacity:0;
+  transition: opacity 300ms ease;
+  pointer-events:none;
+}
+
+.themeBtn:focus-visible::after{
+  opacity:.4;
+}
+
+/* respeita usuários que preferem menos animação */
+@media (prefers-reduced-motion: reduce){
+  .themeBtn{
+    transition:none !important;
+  }
+}
+
+
+/* =========================
    GLOW PREMIUM – MODO CLARO
    ========================= */
 
@@ -550,3 +601,4 @@
     0 4px 14px rgba(37,99,235,.20),
     0 0 24px rgba(37,99,235,.40);
 }
+
