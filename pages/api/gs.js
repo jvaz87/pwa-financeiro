@@ -1,23 +1,26 @@
 export default async function handler(req, res) {
   try {
-    if (req.method !== "POST") {
-      return res.status(405).json({ ok: false, error: "Method not allowed" });
-    }
-
     const url = process.env.GS_API_URL;
     const token = process.env.GS_API_TOKEN;
 
-    // ✅ DEBUG TEMPORÁRIO (remove depois)
+    // ✅ DEBUG TEMPORÁRIO: permite GET só quando debug=1
     if (req.query?.debug === "1") {
       return res.status(200).json({
         ok: true,
+        method: req.method,
         url,
-        token_prefix: (token || "").slice(0, 12),
+        token_prefix: (token || "").slice(0, 18),
         token_len: (token || "").length,
       });
     }
 
-    if (!url || !token) return res.status(500).json({ ok: false, error: "Missing env vars" });
+    if (req.method !== "POST") {
+      return res.status(405).json({ ok: false, error: "Method not allowed" });
+    }
+
+    if (!url || !token) {
+      return res.status(500).json({ ok: false, error: "Missing env vars" });
+    }
 
     const { action, data } = req.body || {};
     const payload = { token, action, data };
@@ -30,6 +33,7 @@ export default async function handler(req, res) {
 
     const json = await r.json().catch(() => ({}));
     return res.status(r.status).json(json);
+
   } catch (e) {
     return res.status(500).json({ ok: false, error: String(e?.message || e) });
   }
