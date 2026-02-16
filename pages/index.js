@@ -165,7 +165,7 @@ export default function Home() {
     setEditForm({
       date: it.date || todayISO(),
       desc: it.desc || "",
-      value: it.value != null ? String(it.value).replace(".", ",") : "",
+      value: it.value != null ? Number(it.value).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "",
       type: it.type || "",
       nature: it.nature || "",
       pay: it.pay || "",
@@ -205,6 +205,37 @@ export default function Home() {
   }
 
   // ---------- Utils ----------
+function onlyDigits(s) {
+  return String(s || "").replace(/\D/g, "");
+}
+
+// "1234" => "12,34"
+function digitsToBRLString(digits) {
+  const d = onlyDigits(digits);
+  const cents = Number(d || "0");
+  const v = cents / 100;
+
+  // Formata sem "R$" (só número com vírgula)
+  return v.toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
+// garante formato do payload: "12,34"
+function normalizeValueToBRString(valueText) {
+  // se já vier no formato "12,34" ou "12.34", tenta normalizar
+  const s = String(valueText || "").trim();
+  if (!s) return "";
+
+  // se tiver vírgula/ponto, tenta extrair número
+  // mas preferimos o modo "digitsToBRLString" quando usuário digita
+  const digits = onlyDigits(s);
+  if (!digits) return "";
+
+  return digitsToBRLString(digits);
+}
+  
   function brl(v) {
     return Number(v || 0).toLocaleString("pt-BR", {
       style: "currency",
@@ -418,10 +449,18 @@ export default function Home() {
           />
 
           <input
-            placeholder="Valor (ex: 12,50)"
-            value={form.value}
-            onChange={(e) => setForm({ ...form, value: e.target.value })}
-          />
+          inputMode="numeric"
+          placeholder="Valor"
+          value={form.value}
+          onChange={(e) => {
+          const masked = digitsToBRLString(e.target.value);
+          setForm({ ...form, value: masked });
+  }}
+  onBlur={() => {
+    // garante que ao sair do campo fique certinho
+    setForm((p) => ({ ...p, value: normalizeValueToBRString(p.value) }));
+  }}
+/>
 
           <select
             value={form.type}
@@ -548,11 +587,16 @@ export default function Home() {
                           }
                         />
                         <input
-                          placeholder="Valor (ex: 12,50)"
+                          inputMode="numeric"
+                          placeholder="Valor"
                           value={editForm.value}
-                          onChange={(e) =>
-                            setEditForm({ ...editForm, value: e.target.value })
-                          }
+                          onChange={(e) => {
+                            const masked = digitsToBRLString(e.target.value);
+                            setEditForm({ ...editForm, value: masked });
+                         }}
+                          onBlur={() => {
+                            setEditForm((p) => ({ ...p, value: normalizeValueToBRString(p.value) }));
+                         }}
                         />
 
                         <select
@@ -613,3 +657,4 @@ export default function Home() {
     </div>
   );
 }
+
