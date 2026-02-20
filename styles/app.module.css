@@ -414,3 +414,41 @@
 .dashActions button:hover{
   background:var(--btnHover);
 }
+
+.divider{
+  height:1px;
+  background:var(--line);
+  margin:6px 0;
+  border-radius:999px;
+}
+
+.importBtn{
+  width:100%;
+  padding:14px;
+  border-radius:16px;
+  border:1px solid var(--line);
+  background:var(--btnBg);
+  font-weight:900;
+  font-size:16px;
+  cursor:pointer;
+  display:block;
+  text-align:center;
+}
+.importBtn:hover{ background:var(--btnHover); }
+
+.dashActions3{
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap:10px;
+}
+.dashActions3 button{
+  width:100%;
+  padding:12px;
+  border-radius:16px;
+  border:1px solid var(--line);
+  background:var(--btnBg);
+  font-weight:1000;
+  font-size:15px;
+  cursor:pointer;
+}
+.dashActions3 button:hover{ background:var(--btnHover); }
