@@ -16,15 +16,19 @@ export default function Home() {
     variavelGasto: 0,
     fixoReceb: 0,
     variavelReceb: 0,
+    yearTotals: { gasto: 0, recebimento: 0, saldo: 0 },
   });
 
   const [msg, setMsg] = useState("");
 
-  // Tema (usa o data-theme no html)
+  // Tema
   const [theme, setTheme] = useState("dark");
 
-  // Buscar no histórico
+  // Buscar histórico
   const [q, setQ] = useState("");
+
+  // Import CSV
+  const [importing, setImporting] = useState(false);
 
   // Form lançar
   const [form, setForm] = useState({
@@ -126,12 +130,34 @@ export default function Home() {
     }
   }
 
+  // ---------- Valor inteligente ----------
+  function onlyDigits(s) {
+    return String(s || "").replace(/\D/g, "");
+  }
+
+  // "1234" => "12,34"
+  function digitsToBRLString(input) {
+    const d = onlyDigits(input);
+    const cents = Number(d || "0");
+    const v = cents / 100;
+    return v.toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  }
+
+  function normalizeValueToBRString(valueText) {
+    const digits = onlyDigits(valueText);
+    if (!digits) return "";
+    return digitsToBRLString(digits);
+  }
+
   // ---------- Lançar ----------
   async function save() {
     try {
       setMsg("");
 
-      // obrigatórios (mantive pagamento obrigatório pra não quebrar o backend)
+      // obrigatórios (mantive pagamento obrigatório pra bater com o backend)
       if (!form.desc || !form.value || !form.type || !form.nature || !form.pay) {
         return setMsg("❌ Preencha descrição, valor, tipo, natureza e pagamento.");
       }
@@ -165,7 +191,13 @@ export default function Home() {
     setEditForm({
       date: it.date || todayISO(),
       desc: it.desc || "",
-      value: it.value != null ? Number(it.value).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "",
+      value:
+        it.value != null
+          ? Number(it.value).toLocaleString("pt-BR", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })
+          : "",
       type: it.type || "",
       nature: it.nature || "",
       pay: it.pay || "",
@@ -191,7 +223,13 @@ export default function Home() {
     try {
       setMsg("");
 
-      if (!editForm.desc || !editForm.value || !editForm.type || !editForm.nature || !editForm.pay) {
+      if (
+        !editForm.desc ||
+        !editForm.value ||
+        !editForm.type ||
+        !editForm.nature ||
+        !editForm.pay
+      ) {
         return setMsg("❌ Preencha descrição, valor, tipo, natureza e pagamento.");
       }
 
@@ -204,38 +242,156 @@ export default function Home() {
     }
   }
 
+  // ---------- CSV Backup completo ----------
+  async function exportCSV() {
+    try {
+      setMsg("");
+      const j = await api("export_csv", { scope: "all" }); // só completo
+      const csv = j.csv || "";
+      const filename = j.filename || "backup-completo.csv";
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+
+      setMsg("✅ Backup CSV exportado!");
+    } catch (e) {
+      setMsg("❌ " + e.message);
+    }
+  }
+
+  async function importCSVFile(file) {
+    try {
+      setMsg("");
+      setImporting(true);
+      const text = await file.text();
+      const j = await api("import_csv", { csv: text });
+      setMsg(`✅ Importado! Linhas: ${j.inserted} • Ignoradas: ${j.skipped}`);
+      await refresh();
+      setScreen("hist");
+    } catch (e) {
+      setMsg("❌ " + e.message);
+    } finally {
+      setImporting(false);
+    }
+  }
+
+  // ---------- PDF ----------
+  function escapeHtml(s) {
+    return String(s ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#39;");
+  }
+
+  function exportPDF() {
+    const rows = filteredItems; // respeita busca no histórico; quer sempre tudo do mês? use "items"
+    const title = `Relatório • ${fmtMonth(month)}`;
+    const now = new Date().toLocaleString("pt-BR");
+
+    const html = `
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>${escapeHtml(title)}</title>
+  <style>
+    *{ box-sizing:border-box; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; }
+    body{ margin:24px; color:#0b1324; }
+    h1{ margin:0 0 6px; font-size:20px; }
+    .muted{ color:rgba(11,19,36,.62); font-weight:700; font-size:12px; }
+    .kpis{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin:14px 0 18px; }
+    .card{ border:1px solid rgba(11,19,36,.12); border-radius:14px; padding:12px; }
+    .label{ font-size:12px; font-weight:900; color:rgba(11,19,36,.62); }
+    .value{ margin-top:6px; font-size:16px; font-weight:1000; }
+    .green{ color:#16a34a; }
+    .red{ color:#dc2626; }
+    .saldoPos{ color:#0f766e; }
+    .saldoNeg{ color:#dc2626; }
+    table{ width:100%; border-collapse:collapse; }
+    th, td{ border-bottom:1px solid rgba(11,19,36,.12); padding:10px 8px; text-align:left; font-size:12px; }
+    th{ font-size:12px; color:rgba(11,19,36,.62); font-weight:1000; }
+    .right{ text-align:right; }
+    .badge{ display:inline-block; padding:2px 8px; border-radius:999px; border:1px solid rgba(11,19,36,.12); font-weight:900; font-size:11px; }
+    .badgeG{ color:#dc2626; border-color:rgba(220,38,38,.25); background:rgba(220,38,38,.06);}
+    .badgeR{ color:#16a34a; border-color:rgba(22,163,74,.25); background:rgba(22,163,74,.06);}
+    @media print{ body{ margin:12mm; } }
+  </style>
+</head>
+<body>
+  <h1>${escapeHtml(title)}</h1>
+  <div class="muted">Gerado em ${escapeHtml(now)}</div>
+
+  <div class="kpis">
+    <div class="card">
+      <div class="label">Recebimentos</div>
+      <div class="value green">${escapeHtml(brl(totals.recebimento))}</div>
+      <div class="muted">Fixo: ${escapeHtml(brl(totals.fixoReceb ?? 0))} • Variável: ${escapeHtml(brl(totals.variavelReceb ?? 0))}</div>
+    </div>
+    <div class="card">
+      <div class="label">Gastos</div>
+      <div class="value red">${escapeHtml(brl(totals.gasto))}</div>
+      <div class="muted">Fixo: ${escapeHtml(brl(totals.fixoGasto ?? 0))} • Variável: ${escapeHtml(brl(totals.variavelGasto ?? 0))}</div>
+    </div>
+    <div class="card">
+      <div class="label">Saldo</div>
+      <div class="value ${Number(totals.saldo||0) >= 0 ? "saldoPos" : "saldoNeg"}">${escapeHtml(brl(totals.saldo))}</div>
+      <div class="muted">Mês selecionado</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Descrição</th>
+        <th>Tipo</th>
+        <th>Natureza</th>
+        <th>Pagamento</th>
+        <th class="right">Valor</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${
+        rows.map(it => `
+          <tr>
+            <td>${escapeHtml(it.dateBR)}</td>
+            <td>${escapeHtml(it.desc)}</td>
+            <td>
+              <span class="badge ${String(it.type||"").toLowerCase()==="gasto" ? "badgeG" : "badgeR"}">
+                ${escapeHtml(it.type)}
+              </span>
+            </td>
+            <td>${escapeHtml(it.nature)}</td>
+            <td>${escapeHtml(it.pay)}</td>
+            <td class="right">${escapeHtml(brl(it.value))}</td>
+          </tr>
+        `).join("")
+      }
+    </tbody>
+  </table>
+
+  <script>setTimeout(() => window.print(), 250);</script>
+</body>
+</html>`;
+
+    const w = window.open("", "_blank");
+    if (!w) return setMsg("❌ O navegador bloqueou pop-up. Permita pop-ups para exportar PDF.");
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+  }
+
   // ---------- Utils ----------
-function onlyDigits(s) {
-  return String(s || "").replace(/\D/g, "");
-}
-
-// "1234" => "12,34"
-function digitsToBRLString(digits) {
-  const d = onlyDigits(digits);
-  const cents = Number(d || "0");
-  const v = cents / 100;
-
-  // Formata sem "R$" (só número com vírgula)
-  return v.toLocaleString("pt-BR", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-}
-
-// garante formato do payload: "12,34"
-function normalizeValueToBRString(valueText) {
-  // se já vier no formato "12,34" ou "12.34", tenta normalizar
-  const s = String(valueText || "").trim();
-  if (!s) return "";
-
-  // se tiver vírgula/ponto, tenta extrair número
-  // mas preferimos o modo "digitsToBRLString" quando usuário digita
-  const digits = onlyDigits(s);
-  if (!digits) return "";
-
-  return digitsToBRLString(digits);
-}
-  
   function brl(v) {
     return Number(v || 0).toLocaleString("pt-BR", {
       style: "currency",
@@ -249,7 +405,6 @@ function normalizeValueToBRString(valueText) {
   }
 
   function fmtMonth(ym) {
-    // ym = "2026-02"
     if (!/^\d{4}-\d{2}$/.test(String(ym || ""))) return String(ym || "");
     const [y, m] = ym.split("-");
     const names = [
@@ -267,10 +422,10 @@ function normalizeValueToBRString(valueText) {
     );
   }, [items, q]);
 
-  // Barra gasto/receb
   const gasto = Number(totals.gasto || 0);
   const receb = Number(totals.recebimento || 0);
-  const perc = receb > 0 ? Math.min(100, (gasto / receb) * 100) : gasto > 0 ? 100 : 0;
+  const perc =
+    receb > 0 ? Math.min(100, (gasto / receb) * 100) : gasto > 0 ? 100 : 0;
 
   const saldoNum = Number(totals.saldo || 0);
 
@@ -311,6 +466,26 @@ function normalizeValueToBRString(valueText) {
           <button onClick={() => setScreen("dash")}>📊 Dashboard</button>
           <button onClick={() => setScreen("add")}>➕ Lançar</button>
           <button onClick={() => setScreen("hist")}>🧾 Histórico</button>
+
+          <div className={styles.divider} />
+
+          <button onClick={exportPDF}>📄 Exportar relatório (PDF)</button>
+
+          <button onClick={exportCSV}>💾 Exportar backup (CSV)</button>
+
+          <label className={styles.importBtn}>
+            {importing ? "⏳ Importando..." : "📥 Importar backup (CSV)"}
+            <input
+              type="file"
+              accept=".csv,text/csv"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                e.target.value = "";
+                if (f) importCSVFile(f);
+              }}
+              style={{ display: "none" }}
+            />
+          </label>
         </section>
       )}
 
@@ -426,8 +601,9 @@ function normalizeValueToBRString(valueText) {
             </div>
           </div>
 
-          <div className={styles.dashActions}>
+          <div className={styles.dashActions3}>
             <button onClick={refresh}>Atualizar</button>
+            <button onClick={exportPDF}>📄 PDF</button>
             <button onClick={() => setScreen("home")}>Voltar</button>
           </div>
         </section>
@@ -449,18 +625,17 @@ function normalizeValueToBRString(valueText) {
           />
 
           <input
-          inputMode="numeric"
-          placeholder="Valor"
-          value={form.value}
-          onChange={(e) => {
-          const masked = digitsToBRLString(e.target.value);
-          setForm({ ...form, value: masked });
-  }}
-  onBlur={() => {
-    // garante que ao sair do campo fique certinho
-    setForm((p) => ({ ...p, value: normalizeValueToBRString(p.value) }));
-  }}
-/>
+            inputMode="numeric"
+            placeholder="Valor"
+            value={form.value}
+            onChange={(e) => {
+              const masked = digitsToBRLString(e.target.value);
+              setForm({ ...form, value: masked });
+            }}
+            onBlur={() => {
+              setForm((p) => ({ ...p, value: normalizeValueToBRString(p.value) }));
+            }}
+          />
 
           <select
             value={form.type}
@@ -501,7 +676,6 @@ function normalizeValueToBRString(valueText) {
       {/* HIST */}
       {screen === "hist" && (
         <section className={styles.card}>
-          {/* Barra de busca */}
           <div className={styles.searchRow}>
             <input
               placeholder="Buscar por descrição..."
@@ -513,7 +687,6 @@ function normalizeValueToBRString(valueText) {
             </button>
           </div>
 
-          {/* Lista */}
           {filteredItems.length === 0 ? (
             <div className={styles.empty}>Sem lançamentos neste mês.</div>
           ) : (
@@ -568,7 +741,9 @@ function normalizeValueToBRString(valueText) {
                     <>
                       <div className={styles.editHeader}>
                         <strong>Editando</strong>
-                        <span className={styles.badgeMuted}>#{String(it.id).slice(0, 6)}</span>
+                        <span className={styles.badgeMuted}>
+                          #{String(it.id).slice(0, 6)}
+                        </span>
                       </div>
 
                       <div className={styles.editGrid}>
@@ -586,6 +761,7 @@ function normalizeValueToBRString(valueText) {
                             setEditForm({ ...editForm, desc: e.target.value })
                           }
                         />
+
                         <input
                           inputMode="numeric"
                           placeholder="Valor"
@@ -593,10 +769,13 @@ function normalizeValueToBRString(valueText) {
                           onChange={(e) => {
                             const masked = digitsToBRLString(e.target.value);
                             setEditForm({ ...editForm, value: masked });
-                         }}
+                          }}
                           onBlur={() => {
-                            setEditForm((p) => ({ ...p, value: normalizeValueToBRString(p.value) }));
-                         }}
+                            setEditForm((p) => ({
+                              ...p,
+                              value: normalizeValueToBRString(p.value),
+                            }));
+                          }}
                         />
 
                         <select
@@ -613,10 +792,7 @@ function normalizeValueToBRString(valueText) {
                         <select
                           value={editForm.nature}
                           onChange={(e) =>
-                            setEditForm({
-                              ...editForm,
-                              nature: e.target.value,
-                            })
+                            setEditForm({ ...editForm, nature: e.target.value })
                           }
                         >
                           <option value="">Natureza</option>
@@ -637,7 +813,10 @@ function normalizeValueToBRString(valueText) {
                       </div>
 
                       <div className={styles.row2}>
-                        <button className={styles.primaryBtn} onClick={submitEdit}>
+                        <button
+                          className={styles.primaryBtn}
+                          onClick={submitEdit}
+                        >
                           Salvar
                         </button>
                         <button onClick={cancelEdit}>Cancelar</button>
@@ -657,4 +836,3 @@ function normalizeValueToBRString(valueText) {
     </div>
   );
 }
-
